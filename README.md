@@ -1,7 +1,7 @@
 [![NPM version][npm-image]][npm-url] [![Build Status](https://travis-ci.org/sheremetat/signalfx-nodejs.svg?branch=master)](https://travis-ci.org/sheremetat/signalfx-nodejs)
 # NodeJS client library for SignalFx
 
-This is a programmatic interface in JavaScript(commomjs) for SignalFx's metadata and
+This is a programmatic interface in JavaScript(CommonJS) for SignalFx's metadata and
 ingest APIs. It is meant to provide a base for communicating with
 SignalFx APIs that can be easily leveraged by scripts and applications
 to interact with SignalFx or report metric and event data to SignalFx.
@@ -43,19 +43,19 @@ var signalfx = require('signalfx');
 
 var client = new signalFx.SignalFx('MY_SIGNALFX_TOKEN');
 
-client.send(
-           [
+client.send({
+           cumulative_counters:[
              {metric: 'myfunc.calls_cumulative', value: 10},
              ...
            ],
-           [
+           gauges:[
              {metric: 'myfunc.time', value: 532},
              ...
            ],
-           [
+           counters:[
              {metric: 'myfunc.calls', value: 42},
              ...
-           ])
+           ]});
 ```
 
 Reporting Dimensions for the data is optional and can be accomplished as follows:
@@ -65,19 +65,19 @@ var signalfx = require('signalfx');
 
 var client = new signalFx.SignalFx('MY_SIGNALFX_TOKEN');
 
-client.send(
-          [
+client.send({
+          cumulative_counters:[
             {'metric': 'myfunc.calls_cumulative', 'value': 10, 'dimensions': {'host': 'server1', 'host_ip': '1.2.3.4'}},
             ...
           ],
-          [
+          gauges:[
             {'metric': 'myfunc.time', 'value': 532, 'dimensions': {'host': 'server1', 'host_ip': '1.2.3.4'}},
             ...
           ],
-          [
+          counters:[
             {'metric': 'myfunc.calls', 'value': 42, 'dimensions': {'host': 'server1', 'host_ip': '1.2.3.4'}},
             ...
-          ]
+          ]});
 ```
 
 ### Sending events
@@ -113,15 +113,15 @@ var myToken = 'MY_SIGNALFX_TOKEN';
 var client = new signalFx.SignalFx(myToken);
 var gauges = [{
         metric: 'test.cpu',
-        value: counter % 10
+        value: 10
       }];
 
 var counters = [{
         metric: 'cpu_cnt',
-        value: counter % 2
+        value:  2
       }];
       
-client.send(null, gauges, counters);
+client.send({gauges: gauges, counters: counters});
 ```
 
 Complete code example for Sending events
