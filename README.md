@@ -24,9 +24,10 @@ obtained from the SignalFx organization you want to report data into.
 
 ### Create client
 
-There are two ways to create client object: using default constructor `SignalFx` 
-or JSON constructor `SignalFxJson`. Default constructor uses Protobuf to send data to SignalFx,
-or, if it is impossible, JSON. JSON constructor force use JSON format to send data to SignalFx
+There are two ways to create a client object: 
+
++ The default constructor `SignalFx`. This constructor uses Protobuf to send data to SignalFx. If it cannot send Protobuf, it falls back to sending JSON. 
++ The JSON constructor `SignalFxJson`. This constructor uses JSON format to send data to SignalFx.
 
 ```js
 var signalfx = require('signalfx');
@@ -38,6 +39,9 @@ var clientJson = new signalFx.SignalFxJson('MY_SIGNALFX_TOKEN');
 ```
 
 ### Reporting data
+
+This example shows how to report metrics to SignalFx, as gauges, counters, or cumulative counters. 
+
 ```js
 var signalfx = require('signalfx');
 
@@ -58,7 +62,7 @@ client.send({
            ]});
 ```
 
-Reporting Dimensions for the data is optional and can be accomplished as follows:
+Optionally, you can also add dimensions to the metrics, as follows:
 
 ```js
 var signalfx = require('signalfx');
