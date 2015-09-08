@@ -1,7 +1,7 @@
 [![NPM version][npm-image]][npm-url] [![Build Status](https://travis-ci.org/signalfx/signalfx-nodejs.svg?branch=master)](https://travis-ci.org/signalfx/signalfx-nodejs)
-# NodeJS client library for SignalFx
+# Node.js client library for SignalFx
 
-This is a programmatic interface in JavaScript(CommonJS) for SignalFx's metadata and
+This is a programmatic interface in JavaScript for SignalFx's metadata and
 ingest APIs. It is meant to provide a base for communicating with
 SignalFx APIs that can be easily leveraged by scripts and applications
 to interact with SignalFx or report metric and event data to SignalFx.
