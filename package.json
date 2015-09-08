@@ -1,0 +1,41 @@
+{
+  "name": "signalfx",
+  "version": "0.1.0",
+  "description": "NodeJS client library for SignalFx",
+  "homepage": "https://signalfx.com",
+  "repository": "https://github.com/signalfx/signalfx-nodejs",
+  "author": {
+    "name": "SignalFx, Inc",
+    "email": "info@signalfx.com",
+    "url": "https://signalfx.com"
+  },
+  "files": [
+    "lib"
+  ],
+  "main": "lib/signalfx.js",
+  "keywords": [
+    "signalfx",
+    "nodejs"
+  ],
+  "devDependencies": {
+    "async": "^1.4.2",
+    "chai": "^3.2.0",
+    "gulp": "^3.6.0",
+    "gulp-eslint": "^0.15.0",
+    "gulp-exclude-gitignore": "^1.0.0",
+    "gulp-istanbul": "^0.9.0",
+    "gulp-mocha": "^2.0.0",
+    "gulp-nsp": "^0.4.5",
+    "gulp-plumber": "^1.0.0",
+    "mockery": "^1.4.0",
+    "protobufjs": "^4.0.0",
+    "request": "^2.61.0",
+    "sinon": "^1.16.1",
+    "winston": "^1.0.1"
+  },
+  "scripts": {
+    "prepublish": "gulp prepublish",
+    "test": "gulp"
+  },
+  "license": "Apache Software License v2"
+}
