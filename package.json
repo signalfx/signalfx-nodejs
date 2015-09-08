@@ -1,7 +1,7 @@
 {
   "name": "signalfx",
   "version": "0.1.0",
-  "description": "NodeJS client library for SignalFx",
+  "description": "Node.js client library for SignalFx",
   "homepage": "https://signalfx.com",
   "repository": "https://github.com/signalfx/signalfx-nodejs",
   "author": {
