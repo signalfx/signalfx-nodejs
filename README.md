@@ -33,10 +33,18 @@ There are two ways to create a client object:
 var signalfx = require('signalfx');
 
 // Create default client
-var client = new signalFx.SignalFx('MY_SIGNALFX_TOKEN');
+var client = new signalFx.SignalFx('MY_SIGNALFX_TOKEN' [, options]);
 // or create JSON client
-var clientJson = new signalFx.SignalFxJson('MY_SIGNALFX_TOKEN');
+var clientJson = new signalFx.SignalFxJson('MY_SIGNALFX_TOKEN' [, options]);
 ```
+Object `options` is optional and may contains following options:
++ **enableAmazonUniqueId** - boolean, `false` by default. If `true`, library will retrieve Amazon unique identifier and set it as `AWSUniqueId` dimension for each datapoint and event. Use this option only if your application deployed to Amazon  
++ **dimensions** - object, pre-defined dimensions for each datapoint and event
++ **ingestEndpoint** -  string
++ **apiEndpoint** - string
++ **timeout** - number
++ **batchSize** - number
++ **userAgents** - array
 
 ### Reporting data
 
@@ -49,20 +57,29 @@ var client = new signalFx.SignalFx('MY_SIGNALFX_TOKEN');
 
 client.send({
            cumulative_counters:[
-             {metric: 'myfunc.calls_cumulative', value: 10},
+             {  metric: 'myfunc.calls_cumulative', 
+                value: 10,
+                timestamp: 1442960607000},
              ...
            ],
            gauges:[
-             {metric: 'myfunc.time', value: 532},
+             {  metric: 'myfunc.time', 
+                value: 532,
+                timestamp: 1442960607000},
              ...
            ],
            counters:[
-             {metric: 'myfunc.calls', value: 42},
+             {  metric: 'myfunc.calls', 
+                value: 42,
+                timestamp: 1442960607000},
              ...
            ]});
 ```
+The `timestamp` must be a millisecond precision timestamp; the number of milliseconds elapsed since Epoch. The `timestamp` field is optional, but strongly recommended. If not specified, it will be set by SignalFx's ingest servers automatically; in this situation, the timestamp of your datapoints will not accurately represent the time of their measurement (network latency, batching, etc. will all impact when those datapoints actually make it to SignalFx).
 
-Optionally, you can also add dimensions to the metrics, as follows:
+### Sending multi-dimensional data
+
+Reporting dimensions for the data is also optional, and can be accomplished by specifying a `dimensions` parameter on each datapoint containing a dictionary of string to string key/value pairs representing the dimensions:
 
 ```js
 var signalfx = require('signalfx');
@@ -71,15 +88,21 @@ var client = new signalFx.SignalFx('MY_SIGNALFX_TOKEN');
 
 client.send({
           cumulative_counters:[
-            {'metric': 'myfunc.calls_cumulative', 'value': 10, 'dimensions': {'host': 'server1', 'host_ip': '1.2.3.4'}},
+            { 'metric': 'myfunc.calls_cumulative', 
+              'value': 10, 
+              'dimensions': {'host': 'server1', 'host_ip': '1.2.3.4'}},
             ...
           ],
           gauges:[
-            {'metric': 'myfunc.time', 'value': 532, 'dimensions': {'host': 'server1', 'host_ip': '1.2.3.4'}},
+            { 'metric': 'myfunc.time', 
+              'value': 532, 
+              'dimensions': {'host': 'server1', 'host_ip': '1.2.3.4'}},
             ...
           ],
           counters:[
-            {'metric': 'myfunc.calls', 'value': 42, 'dimensions': {'host': 'server1', 'host_ip': '1.2.3.4'}},
+            { 'metric': 'myfunc.calls', 
+              'value': 42, 
+              'dimensions': {'host': 'server1', 'host_ip': '1.2.3.4'}},
             ...
           ]});
 ```
@@ -146,7 +169,12 @@ var properties = {version: '[EVENT-VERSION]'};
 
 client.sendEvent(eventType, dimensions, properties);
 ```
+See `example/generic_usage.js` for a complete code example for Reporting data.
+Set your SignalFx token and run example 
 
+```sh
+$ node path/to/example/generic_usage.js
+```
 
 ## License
 

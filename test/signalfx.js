@@ -3,6 +3,7 @@
 
 var sinon = require('sinon');
 var mockery = require('mockery');
+var request = require('request');
 var should = require('chai').should();
 
 var signalFx;
@@ -31,6 +32,7 @@ describe('Integration test (Protobuf mode)', function () {
 
   after(function () {
     mockery.disable();
+    mockery.deregisterAll();
   });
 
 
@@ -102,6 +104,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
 
   after(function () {
     mockery.disable();
+    mockery.deregisterAll();
   });
 
   it('should be created', function () {
@@ -122,9 +125,11 @@ describe('SignalFx client library (Protobuf mode)', function () {
     var batchSize = 301;
     var userAgents = 'TestCl';
 
-    var client = new signalFx.SignalFx(token, ingestEndpoint,
-      apiEndpoint, timeout,
-      batchSize, userAgents);
+    var client = new signalFx.SignalFx(token, {
+      ingestEndpoint: ingestEndpoint,
+      apiEndpoint: apiEndpoint, timeout: timeout,
+      batchSize: batchSize, userAgents: userAgents
+    });
 
     client.should.not.be.empty;
 
@@ -136,6 +141,45 @@ describe('SignalFx client library (Protobuf mode)', function () {
     client.userAgents.should.be.equal(userAgents);
 
     var isInstancedOfSignalFx = (client instanceof signalFx.SignalFx);
+    isInstancedOfSignalFx.should.be.equal(true);
+  });
+
+  it('should be created with AWS Unique ID', function () {
+    requestStub.yields(null, {statusCode: 200}, '{"region": "region", "instanceId": "instance", "accountId": "account"}');
+
+    var token = 'my token';
+    var enableAmazonUniqueId = true;
+
+    var client = new signalFx.SignalFxJson(token, {
+      enableAmazonUniqueId: enableAmazonUniqueId
+    });
+
+    client.apiToken.should.be.equal(token);
+    client.AWSUniqueId.should.be.equal('instance_region_account');
+    client.enableAmazonUniqueId.should.be.equal(true);
+    should.exist(client.globalDimensions[client.AWSUniqueId_DIMENTION_NAME]);
+    client.globalDimensions[client.AWSUniqueId_DIMENTION_NAME].should.be.equal('instance_region_account');
+
+    var isInstancedOfSignalFx = (client instanceof signalFx.SignalFxJson);
+    isInstancedOfSignalFx.should.be.equal(true);
+  });
+
+  it('should be not created with AWS Unique ID(wrong responce)', function () {
+    requestStub.yields(null, {statusCode: 28}, '');
+
+    var token = 'my token';
+    var enableAmazonUniqueId = true;
+
+    var client = new signalFx.SignalFxJson(token, {
+      enableAmazonUniqueId: enableAmazonUniqueId
+    });
+
+    client.apiToken.should.be.equal(token);
+    client.enableAmazonUniqueId.should.be.equal(false);
+    client.AWSUniqueId.should.be.equal('');
+    should.not.exist(client.globalDimensions[client.AWSUniqueId_DIMENTION_NAME]);
+
+    var isInstancedOfSignalFx = (client instanceof signalFx.SignalFxJson);
     isInstancedOfSignalFx.should.be.equal(true);
   });
 
@@ -183,7 +227,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
   });
 
 
-  it('Send event via queue', function (done) {
+  it('Send event', function (done) {
     requestStub.yields(null, {statusCode: 200}, 'OK');
 
     var token = 'my token';
@@ -352,6 +396,252 @@ describe('SignalFx client library (Protobuf mode)', function () {
     dataToSend.should.not.be.empty;
   });
 
+  it('should have dimensions + predefined dimensions (Protobuf)', function () {
+
+    var token = 'my token';
+    var client = new signalFx.SignalFx(token, {dimensions: {dep1: 'dep1', dep2: 'dep2'}});
+
+    var gauges = [{
+      metric: 'test.cpu',
+      value: 10,
+      dimensions: {host: 'server1', host_ip: '1.2.3.4'}
+    }];
+
+    requestStub.yields(null, {statusCode: 200}, 'OK');
+    client.send({gauges: gauges});
+    client.queue.length.should.be.equal(1);
+
+    var expectedGauge = {
+      source: null,
+      metric: 'test.cpu',
+      timestamp: null,
+      value: {intValue: 10},
+      metricType: 0,
+      dimensions: [{key: 'host', value: 'server1'}, {key: 'host_ip', value: '1.2.3.4'}, {
+        key: 'dep1',
+        value: 'dep1'
+      }, {key: 'dep2', value: 'dep2'}]
+    };
+
+    var queue = client.queue;
+    var realGauge = queue[0];
+    realGauge.metric.should.be.equal(expectedGauge.metric);
+    realGauge.value.intValue.should.be.equal(expectedGauge.value.intValue);
+    realGauge.metricType.should.be.equal(expectedGauge.metricType);
+    realGauge.dimensions.length.should.be.equal(expectedGauge.dimensions.length);
+    realGauge.dimensions[0].key.should.not.be.empty;
+    realGauge.dimensions[0].key.should.be.equal(expectedGauge.dimensions[0].key);
+    realGauge.dimensions[0].value.should.not.be.empty;
+    realGauge.dimensions[0].value.should.be.equal(expectedGauge.dimensions[0].value);
+
+    realGauge.dimensions[2].key.should.not.be.empty;
+    realGauge.dimensions[2].key.should.be.equal('dep1');
+    realGauge.dimensions[2].value.should.not.be.empty;
+    realGauge.dimensions[2].value.should.be.equal('dep1');
+
+
+    realGauge.dimensions[3].key.should.not.be.empty;
+    realGauge.dimensions[3].key.should.be.equal('dep2');
+    realGauge.dimensions[3].value.should.not.be.empty;
+    realGauge.dimensions[3].value.should.be.equal('dep2');
+  });
+
+  it('should have only predefined dimensions (Protobuf)', function () {
+
+    var token = 'my token';
+    var client = new signalFx.SignalFx(token, {dimensions: {dep1: 'dep1', dep2: 'dep2'}});
+
+    var gauges = [{
+      metric: 'test.cpu',
+      value: 10
+    }];
+
+    requestStub.yields(null, {statusCode: 200}, 'OK');
+    client.send({gauges: gauges});
+    client.queue.length.should.be.equal(1);
+
+    var expectedGauge = {
+      source: null,
+      metric: 'test.cpu',
+      timestamp: null,
+      value: {intValue: 10},
+      metricType: 0,
+      dimensions: [{
+        key: 'dep1',
+        value: 'dep1'
+      }, {key: 'dep2', value: 'dep2'}]
+    };
+
+    var queue = client.queue;
+    var realGauge = queue[0];
+    realGauge.metric.should.be.equal(expectedGauge.metric);
+    realGauge.value.intValue.should.be.equal(expectedGauge.value.intValue);
+    realGauge.metricType.should.be.equal(expectedGauge.metricType);
+
+    realGauge.dimensions[0].key.should.not.be.empty;
+    realGauge.dimensions[0].key.should.be.equal('dep1');
+    realGauge.dimensions[0].value.should.not.be.empty;
+    realGauge.dimensions[0].value.should.be.equal('dep1');
+
+
+    realGauge.dimensions[1].key.should.not.be.empty;
+    realGauge.dimensions[1].key.should.be.equal('dep2');
+    realGauge.dimensions[1].value.should.not.be.empty;
+    realGauge.dimensions[1].value.should.be.equal('dep2');
+  });
+
+  it('should have only AWSUniqueID in dimensions (Protobuf)', function (done) {
+    requestStub.yields(null, {statusCode: 200}, '{"region": "region", "instanceId": "instance", "accountId": "account"}');
+
+    var token = 'my token';
+    var client = new signalFx.SignalFx(token, {enableAmazonUniqueId: true});
+
+    var gauges = [{
+      metric: 'test.cpu',
+      value: 10
+    }];
+
+    this.setTimeout = 1050;
+    setTimeout(function () {
+      requestStub.yields(null, {statusCode: 200}, 'OK');
+      client.send({gauges: gauges});
+      client.queue.length.should.be.equal(1);
+
+      var expectedGauge = {
+        source: null,
+        metric: 'test.cpu',
+        timestamp: null,
+        value: {intValue: 10},
+        metricType: 0
+      };
+
+      var queue = client.queue;
+      var realGauge = queue[0];
+      realGauge.metric.should.be.equal(expectedGauge.metric);
+      realGauge.value.intValue.should.be.equal(expectedGauge.value.intValue);
+      realGauge.metricType.should.be.equal(expectedGauge.metricType);
+
+      realGauge.dimensions[0].key.should.not.be.empty;
+      realGauge.dimensions[0].key.should.be.equal('AWSUniqueId');
+      realGauge.dimensions[0].value.should.not.be.empty;
+      realGauge.dimensions[0].value.should.be.equal('instance_region_account');
+
+      done();
+    }, 1500);
+
+  });
+
+  it('should have AWSUniqueID in dimensions (Protobuf)', function (done) {
+    requestStub.yields(null, {statusCode: 200}, '{"region": "region", "instanceId": "instance", "accountId": "account"}');
+
+    var token = 'my token';
+    var client = new signalFx.SignalFx(token, {enableAmazonUniqueId: true});
+
+    var gauges = [{
+      metric: 'test.cpu',
+      value: 10,
+      dimensions: {host: 'server1', host_ip: '1.2.3.4'}
+    }];
+
+    this.setTimeout = 1050;
+    setTimeout(function () {
+      requestStub.yields(null, {statusCode: 200}, 'OK');
+      client.send({gauges: gauges});
+      client.queue.length.should.be.equal(1);
+
+      var expectedGauge = {
+        source: null,
+        metric: 'test.cpu',
+        timestamp: null,
+        value: {intValue: 10},
+        metricType: 0,
+        dimensions: [{key: 'host', value: 'server1'}, {key: 'host_ip', value: '1.2.3.4'}]
+      };
+
+      var queue = client.queue;
+      var realGauge = queue[0];
+      realGauge.metric.should.be.equal(expectedGauge.metric);
+      realGauge.value.intValue.should.be.equal(expectedGauge.value.intValue);
+      realGauge.metricType.should.be.equal(expectedGauge.metricType);
+      realGauge.dimensions[0].key.should.not.be.empty;
+      realGauge.dimensions[0].key.should.be.equal(expectedGauge.dimensions[0].key);
+      realGauge.dimensions[0].value.should.not.be.empty;
+      realGauge.dimensions[0].value.should.be.equal(expectedGauge.dimensions[0].value);
+
+      realGauge.dimensions[2].key.should.not.be.empty;
+      realGauge.dimensions[2].key.should.be.equal('AWSUniqueId');
+      realGauge.dimensions[2].value.should.not.be.empty;
+      realGauge.dimensions[2].value.should.be.equal('instance_region_account');
+
+      done();
+    }, 1500);
+
+  });
+
+  it('should have dimensions, global dimensions and AWSUniqueID in dimensions (Protobuf)', function (done) {
+    requestStub.yields(null, {statusCode: 200}, '{"region": "region", "instanceId": "instance", "accountId": "account"}');
+
+    var token = 'my token';
+    var client = new signalFx.SignalFx(token, {
+      enableAmazonUniqueId: true,
+      dimensions: {dep1: 'dep1', dep2: 'dep2'}
+    });
+
+    var gauges = [{
+      metric: 'test.cpu',
+      value: 10,
+      dimensions: {host: 'server1', host_ip: '1.2.3.4'}
+    }];
+
+    this.setTimeout = 1050;
+    setTimeout(function () {
+      requestStub.yields(null, {statusCode: 200}, 'OK');
+      client.send({gauges: gauges});
+      client.queue.length.should.be.equal(1);
+
+      var expectedGauge = {
+        source: null,
+        metric: 'test.cpu',
+        timestamp: null,
+        value: {intValue: 10},
+        metricType: 0,
+        dimensions: [{key: 'host', value: 'server1'}, {key: 'host_ip', value: '1.2.3.4'}, {
+          key: 'dep1',
+          value: 'dep1'
+        }, {key: 'dep2', value: 'dep2'}]
+      };
+
+      var queue = client.queue;
+      var realGauge = queue[0];
+      realGauge.metric.should.be.equal(expectedGauge.metric);
+      realGauge.value.intValue.should.be.equal(expectedGauge.value.intValue);
+      realGauge.metricType.should.be.equal(expectedGauge.metricType);
+      realGauge.dimensions[0].key.should.not.be.empty;
+      realGauge.dimensions[0].key.should.be.equal(expectedGauge.dimensions[0].key);
+      realGauge.dimensions[0].value.should.not.be.empty;
+      realGauge.dimensions[0].value.should.be.equal(expectedGauge.dimensions[0].value);
+
+      realGauge.dimensions[2].key.should.not.be.empty;
+      realGauge.dimensions[2].key.should.be.equal('dep1');
+      realGauge.dimensions[2].value.should.not.be.empty;
+      realGauge.dimensions[2].value.should.be.equal('dep1');
+
+
+      realGauge.dimensions[3].key.should.not.be.empty;
+      realGauge.dimensions[3].key.should.be.equal('dep2');
+      realGauge.dimensions[3].value.should.not.be.empty;
+      realGauge.dimensions[3].value.should.be.equal('dep2');
+
+      realGauge.dimensions[4].key.should.not.be.empty;
+      realGauge.dimensions[4].key.should.be.equal('AWSUniqueId');
+      realGauge.dimensions[4].value.should.not.be.empty;
+      realGauge.dimensions[4].value.should.be.equal('instance_region_account');
+
+      done();
+    }, 1500);
+
+  });
+
   it('should have Protobuf content type', function () {
     var token = 'my token';
     var client = new signalFx.SignalFx(token);
@@ -382,6 +672,7 @@ describe('SignalFx client library (Json mode)', function () {
 
   after(function () {
     mockery.disable();
+    mockery.deregisterAll();
   });
 
   it('should be created', function () {
@@ -402,9 +693,11 @@ describe('SignalFx client library (Json mode)', function () {
     var batchSize = 301;
     var userAgents = 'TestCl';
 
-    var client = new signalFx.SignalFxJson(token, ingestEndpoint,
-      apiEndpoint, timeout,
-      batchSize, userAgents);
+    var client = new signalFx.SignalFxJson(token, {
+      ingestEndpoint: ingestEndpoint,
+      apiEndpoint: apiEndpoint, timeout: timeout,
+      batchSize: batchSize, userAgents: userAgents
+    });
 
     client.should.not.be.empty;
 
@@ -414,6 +707,23 @@ describe('SignalFx client library (Json mode)', function () {
     client.batchSize.should.be.equal(batchSize);
     client.timeout.should.be.equal(timeout);
     client.userAgents.should.be.equal(userAgents);
+
+    var isInstancedOfSignalFx = (client instanceof signalFx.SignalFxJson);
+    isInstancedOfSignalFx.should.be.equal(true);
+  });
+
+  it('should be created with AWS Unique ID', function () {
+    requestStub.yields(null, {statusCode: 200}, '{"region": "region", "instanceId": "instance", "accountId": "account"}');
+
+    var token = 'my token';
+    var enableAmazonUniqueId = true;
+
+    var client = new signalFx.SignalFxJson(token, {
+      enableAmazonUniqueId: enableAmazonUniqueId
+    });
+
+    client.apiToken.should.be.equal(token);
+    client.AWSUniqueId.should.be.equal('instance_region_account');
 
     var isInstancedOfSignalFx = (client instanceof signalFx.SignalFxJson);
     isInstancedOfSignalFx.should.be.equal(true);
@@ -515,6 +825,168 @@ describe('SignalFx client library (Json mode)', function () {
 
     var dataToSend = client._batchData(client.queue);
     dataToSend.should.be.equal(JSON.stringify(expectedGauge));
+  });
+
+  it('should have dimensions + predefined dimensions (Json)', function () {
+
+    var token = 'my token';
+    var client = new signalFx.SignalFxJson(token, {dimensions: {dep1: 'dep1', dep2: 'dep2'}});
+
+    var gauges = [{
+      metric: 'test.cpu',
+      value: 10,
+      dimensions: {host: 'server1', host_ip: '1.2.3.4'}
+    }];
+
+    requestStub.yields(null, {statusCode: 200}, 'OK');
+    client.send({gauges: gauges});
+    client.queue.length.should.be.equal(1);
+
+    var expectedGauge = {
+      gauge: [{
+        metric: 'test.cpu',
+        value: 10,
+        dimensions: {host: 'server1', host_ip: '1.2.3.4', dep1: 'dep1', dep2: 'dep2'}
+      }]
+    };
+
+    var queue = client.queue;
+    var dataToSend = client._batchData(queue);
+    dataToSend.should.be.equal(JSON.stringify(expectedGauge));
+  });
+
+  it('should have only predefined dimensions (Json)', function () {
+
+    var token = 'my token';
+    var client = new signalFx.SignalFxJson(token, {dimensions: {dep1: 'dep1', dep2: 'dep2'}});
+
+    var gauges = [{
+      metric: 'test.cpu',
+      value: 10
+    }];
+
+    requestStub.yields(null, {statusCode: 200}, 'OK');
+    client.send({gauges: gauges});
+    client.queue.length.should.be.equal(1);
+
+    var expectedGauge = {
+      gauge: [{
+        metric: 'test.cpu',
+        value: 10,
+        dimensions: {dep1: 'dep1', dep2: 'dep2'}
+      }]
+    };
+
+    var queue = client.queue;
+    var dataToSend = client._batchData(queue);
+    dataToSend.should.be.equal(JSON.stringify(expectedGauge));
+  });
+
+  it('should have only AWSUniqueID in dimensions (Json)', function (done) {
+    requestStub.yields(null, {statusCode: 200}, '{"region": "region", "instanceId": "instance", "accountId": "account"}');
+
+    var token = 'my token';
+    var client = new signalFx.SignalFxJson(token, {enableAmazonUniqueId: true});
+
+    var gauges = [{
+      metric: 'test.cpu',
+      value: 10
+    }];
+
+    this.setTimeout = 1050;
+    setTimeout(function () {
+      requestStub.yields(null, {statusCode: 200}, 'OK');
+      client.send({gauges: gauges});
+      client.queue.length.should.be.equal(1);
+
+      var expectedGauge = {
+        gauge: [{
+          metric: 'test.cpu',
+          value: 10,
+          dimensions: {AWSUniqueId: 'instance_region_account'}
+        }]
+      };
+      var queue = client.queue;
+      var dataToSend = client._batchData(queue);
+      dataToSend.should.be.equal(JSON.stringify(expectedGauge));
+      done();
+    }, 1500);
+
+  });
+
+  it('should have AWSUniqueID in dimensions (Json)', function (done) {
+    requestStub.yields(null, {statusCode: 200}, '{"region": "region", "instanceId": "instance", "accountId": "account"}');
+
+    var token = 'my token';
+    var client = new signalFx.SignalFxJson(token, {enableAmazonUniqueId: true});
+
+    var gauges = [{
+      metric: 'test.cpu',
+      value: 10,
+      dimensions: {host: 'server1', host_ip: '1.2.3.4'}
+    }];
+
+    this.setTimeout = 1050;
+    setTimeout(function () {
+      requestStub.yields(null, {statusCode: 200}, 'OK');
+      client.send({gauges: gauges});
+      client.queue.length.should.be.equal(1);
+
+      var expectedGauge = {
+        gauge: [{
+          metric: 'test.cpu',
+          value: 10,
+          dimensions: {host: 'server1', host_ip: '1.2.3.4', AWSUniqueId: 'instance_region_account'}
+        }]
+      };
+      var queue = client.queue;
+      var dataToSend = client._batchData(queue);
+      dataToSend.should.be.equal(JSON.stringify(expectedGauge));
+      done();
+    }, 1500);
+
+  });
+
+  it('should have dimensions, global dimensions and AWSUniqueID in dimensions (Json)', function (done) {
+    requestStub.yields(null, {statusCode: 200}, '{"region": "region", "instanceId": "instance", "accountId": "account"}');
+
+    var token = 'my token';
+    var client = new signalFx.SignalFxJson(token, {
+      enableAmazonUniqueId: true,
+      dimensions: {dep1: 'dep1', dep2: 'dep2'}
+    });
+
+    var gauges = [{
+      metric: 'test.cpu',
+      value: 10,
+      dimensions: {host: 'server1', host_ip: '1.2.3.4'}
+    }];
+
+    this.setTimeout = 1050;
+    setTimeout(function () {
+      requestStub.yields(null, {statusCode: 200}, 'OK');
+      client.send({gauges: gauges});
+      client.queue.length.should.be.equal(1);
+
+      var expectedGauge = {
+        gauge: [{
+          metric: 'test.cpu',
+          value: 10,
+          dimensions: {
+            host: 'server1',
+            host_ip: '1.2.3.4',
+            dep1: 'dep1',
+            dep2: 'dep2',
+            AWSUniqueId: 'instance_region_account'
+          }
+        }]
+      };
+      var queue = client.queue;
+      var dataToSend = client._batchData(queue);
+      dataToSend.should.be.equal(JSON.stringify(expectedGauge));
+      done();
+    }, 1500);
+
   });
 
 
