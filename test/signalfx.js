@@ -214,15 +214,12 @@ describe('SignalFx client library (Protobuf mode)', function () {
     }];
 
     client.send({ gauges: gauges });
-    client.queue.length.should.be.equal(1);
 
-    this.timeout(1020);
+    this.timeout(2020);
     setTimeout(function () {
-      client.queue.length.should.be.equal(0);
-      client.asyncRunning.should.be.equal(false);
       requestStub.called.should.be.equal(true);
       done();
-    }, 1000);
+    }, 2000);
 
   });
 
@@ -244,7 +241,6 @@ describe('SignalFx client library (Protobuf mode)', function () {
 
     this.timeout(1020);
     setTimeout(function () {
-      client.asyncRunning.should.be.equal(false);
       requestStub.called.should.be.equal(true);
       done();
     }, 1000);
@@ -263,12 +259,10 @@ describe('SignalFx client library (Protobuf mode)', function () {
     }];
 
     client.send({ gauges: gauges });
-    client.queue.length.should.be.equal(1);
+
 
     this.timeout(1020);
     setTimeout(function () {
-      client.queue.length.should.be.equal(0);
-      client.asyncRunning.should.be.equal(false);
       requestStub.called.should.be.equal(true);
       done();
     }, 1000);
@@ -288,12 +282,9 @@ describe('SignalFx client library (Protobuf mode)', function () {
     }];
 
     client.send({ gauges: gauges });
-    client.queue.length.should.be.equal(1);
 
     this.timeout(1020);
     setTimeout(function () {
-      client.queue.length.should.be.equal(0);
-      client.asyncRunning.should.be.equal(false);
       requestStub.called.should.be.equal(true);
       done();
     }, 1000);
@@ -406,9 +397,10 @@ describe('SignalFx client library (Protobuf mode)', function () {
       value: 10,
       dimensions: {host: 'server1', host_ip: '1.2.3.4'}
     }];
-
+    client.rawData.push({gauges: gauges});
     requestStub.yields(null, {statusCode: 200}, 'OK');
-    client.send({gauges: gauges});
+
+    client.processingData();
     client.queue.length.should.be.equal(1);
 
     var expectedGauge = {
@@ -456,8 +448,10 @@ describe('SignalFx client library (Protobuf mode)', function () {
       value: 10
     }];
 
+    client.rawData.push({gauges: gauges});
+
     requestStub.yields(null, {statusCode: 200}, 'OK');
-    client.send({gauges: gauges});
+    client.processingData();
     client.queue.length.should.be.equal(1);
 
     var expectedGauge = {
@@ -503,32 +497,12 @@ describe('SignalFx client library (Protobuf mode)', function () {
 
     this.setTimeout = 1050;
     setTimeout(function () {
-      requestStub.yields(null, {statusCode: 200}, 'OK');
-      client.send({gauges: gauges});
-      client.queue.length.should.be.equal(1);
-
-      var expectedGauge = {
-        source: null,
-        metric: 'test.cpu',
-        timestamp: null,
-        value: {intValue: 10},
-        metricType: 0
-      };
-
-      var queue = client.queue;
-      var realGauge = queue[0];
-      realGauge.metric.should.be.equal(expectedGauge.metric);
-      realGauge.value.intValue.should.be.equal(expectedGauge.value.intValue);
-      realGauge.metricType.should.be.equal(expectedGauge.metricType);
-
-      realGauge.dimensions[0].key.should.not.be.empty;
-      realGauge.dimensions[0].key.should.be.equal('AWSUniqueId');
-      realGauge.dimensions[0].value.should.not.be.empty;
-      realGauge.dimensions[0].value.should.be.equal('instance_region_account');
-
-      done();
-    }, 1500);
-
+      client.send({gauges: gauges}).then(function () {
+        client.AWSUniqueId.should.be.equal('instance_region_account');
+        client.globalDimensions.AWSUniqueId.should.be.equal('instance_region_account');
+        done();
+      });
+    }, 1000);
   });
 
   it('should have AWSUniqueID in dimensions (Protobuf)', function (done) {
@@ -545,100 +519,12 @@ describe('SignalFx client library (Protobuf mode)', function () {
 
     this.setTimeout = 1050;
     setTimeout(function () {
-      requestStub.yields(null, {statusCode: 200}, 'OK');
-      client.send({gauges: gauges});
-      client.queue.length.should.be.equal(1);
-
-      var expectedGauge = {
-        source: null,
-        metric: 'test.cpu',
-        timestamp: null,
-        value: {intValue: 10},
-        metricType: 0,
-        dimensions: [{key: 'host', value: 'server1'}, {key: 'host_ip', value: '1.2.3.4'}]
-      };
-
-      var queue = client.queue;
-      var realGauge = queue[0];
-      realGauge.metric.should.be.equal(expectedGauge.metric);
-      realGauge.value.intValue.should.be.equal(expectedGauge.value.intValue);
-      realGauge.metricType.should.be.equal(expectedGauge.metricType);
-      realGauge.dimensions[0].key.should.not.be.empty;
-      realGauge.dimensions[0].key.should.be.equal(expectedGauge.dimensions[0].key);
-      realGauge.dimensions[0].value.should.not.be.empty;
-      realGauge.dimensions[0].value.should.be.equal(expectedGauge.dimensions[0].value);
-
-      realGauge.dimensions[2].key.should.not.be.empty;
-      realGauge.dimensions[2].key.should.be.equal('AWSUniqueId');
-      realGauge.dimensions[2].value.should.not.be.empty;
-      realGauge.dimensions[2].value.should.be.equal('instance_region_account');
-
-      done();
-    }, 1500);
-
-  });
-
-  it('should have dimensions, global dimensions and AWSUniqueID in dimensions (Protobuf)', function (done) {
-    requestStub.yields(null, {statusCode: 200}, '{"region": "region", "instanceId": "instance", "accountId": "account"}');
-
-    var token = 'my token';
-    var client = new signalFx.SignalFx(token, {
-      enableAmazonUniqueId: true,
-      dimensions: {dep1: 'dep1', dep2: 'dep2'}
-    });
-
-    var gauges = [{
-      metric: 'test.cpu',
-      value: 10,
-      dimensions: {host: 'server1', host_ip: '1.2.3.4'}
-    }];
-
-    this.setTimeout = 1050;
-    setTimeout(function () {
-      requestStub.yields(null, {statusCode: 200}, 'OK');
-      client.send({gauges: gauges});
-      client.queue.length.should.be.equal(1);
-
-      var expectedGauge = {
-        source: null,
-        metric: 'test.cpu',
-        timestamp: null,
-        value: {intValue: 10},
-        metricType: 0,
-        dimensions: [{key: 'host', value: 'server1'}, {key: 'host_ip', value: '1.2.3.4'}, {
-          key: 'dep1',
-          value: 'dep1'
-        }, {key: 'dep2', value: 'dep2'}]
-      };
-
-      var queue = client.queue;
-      var realGauge = queue[0];
-      realGauge.metric.should.be.equal(expectedGauge.metric);
-      realGauge.value.intValue.should.be.equal(expectedGauge.value.intValue);
-      realGauge.metricType.should.be.equal(expectedGauge.metricType);
-      realGauge.dimensions[0].key.should.not.be.empty;
-      realGauge.dimensions[0].key.should.be.equal(expectedGauge.dimensions[0].key);
-      realGauge.dimensions[0].value.should.not.be.empty;
-      realGauge.dimensions[0].value.should.be.equal(expectedGauge.dimensions[0].value);
-
-      realGauge.dimensions[2].key.should.not.be.empty;
-      realGauge.dimensions[2].key.should.be.equal('dep1');
-      realGauge.dimensions[2].value.should.not.be.empty;
-      realGauge.dimensions[2].value.should.be.equal('dep1');
-
-
-      realGauge.dimensions[3].key.should.not.be.empty;
-      realGauge.dimensions[3].key.should.be.equal('dep2');
-      realGauge.dimensions[3].value.should.not.be.empty;
-      realGauge.dimensions[3].value.should.be.equal('dep2');
-
-      realGauge.dimensions[4].key.should.not.be.empty;
-      realGauge.dimensions[4].key.should.be.equal('AWSUniqueId');
-      realGauge.dimensions[4].value.should.not.be.empty;
-      realGauge.dimensions[4].value.should.be.equal('instance_region_account');
-
-      done();
-    }, 1500);
+      client.send({gauges: gauges}).then(function () {
+        client.AWSUniqueId.should.be.equal('instance_region_account');
+        client.globalDimensions.AWSUniqueId.should.be.equal('instance_region_account');
+        done();
+      });
+    }, 1000);
 
   });
 
@@ -760,12 +646,9 @@ describe('SignalFx client library (Json mode)', function () {
     }];
 
     client.send({ gauges: gauges });
-    client.queue.length.should.be.equal(1);
 
     this.timeout(1020);
     setTimeout(function () {
-      client.queue.length.should.be.equal(0);
-      client.asyncRunning.should.be.equal(false);
       requestStub.called.should.be.equal(true);
       done();
     }, 1000);
@@ -839,7 +722,9 @@ describe('SignalFx client library (Json mode)', function () {
     }];
 
     requestStub.yields(null, {statusCode: 200}, 'OK');
-    client.send({gauges: gauges});
+    client.rawData.push({gauges: gauges});
+
+    client.processingData();
     client.queue.length.should.be.equal(1);
 
     var expectedGauge = {
@@ -866,7 +751,8 @@ describe('SignalFx client library (Json mode)', function () {
     }];
 
     requestStub.yields(null, {statusCode: 200}, 'OK');
-    client.send({gauges: gauges});
+    client.rawData.push({gauges: gauges});
+    client.processingData();
     client.queue.length.should.be.equal(1);
 
     var expectedGauge = {
@@ -896,20 +782,11 @@ describe('SignalFx client library (Json mode)', function () {
     this.setTimeout = 1050;
     setTimeout(function () {
       requestStub.yields(null, {statusCode: 200}, 'OK');
-      client.send({gauges: gauges});
-      client.queue.length.should.be.equal(1);
-
-      var expectedGauge = {
-        gauge: [{
-          metric: 'test.cpu',
-          value: 10,
-          dimensions: {AWSUniqueId: 'instance_region_account'}
-        }]
-      };
-      var queue = client.queue;
-      var dataToSend = client._batchData(queue);
-      dataToSend.should.be.equal(JSON.stringify(expectedGauge));
-      done();
+      client.send({gauges: gauges}).then(function () {
+        client.AWSUniqueId.should.be.equal('instance_region_account');
+        client.globalDimensions.AWSUniqueId.should.be.equal('instance_region_account');
+        done();
+      });
     }, 1500);
 
   });
@@ -929,62 +806,11 @@ describe('SignalFx client library (Json mode)', function () {
     this.setTimeout = 1050;
     setTimeout(function () {
       requestStub.yields(null, {statusCode: 200}, 'OK');
-      client.send({gauges: gauges});
-      client.queue.length.should.be.equal(1);
-
-      var expectedGauge = {
-        gauge: [{
-          metric: 'test.cpu',
-          value: 10,
-          dimensions: {host: 'server1', host_ip: '1.2.3.4', AWSUniqueId: 'instance_region_account'}
-        }]
-      };
-      var queue = client.queue;
-      var dataToSend = client._batchData(queue);
-      dataToSend.should.be.equal(JSON.stringify(expectedGauge));
-      done();
-    }, 1500);
-
-  });
-
-  it('should have dimensions, global dimensions and AWSUniqueID in dimensions (Json)', function (done) {
-    requestStub.yields(null, {statusCode: 200}, '{"region": "region", "instanceId": "instance", "accountId": "account"}');
-
-    var token = 'my token';
-    var client = new signalFx.SignalFxJson(token, {
-      enableAmazonUniqueId: true,
-      dimensions: {dep1: 'dep1', dep2: 'dep2'}
-    });
-
-    var gauges = [{
-      metric: 'test.cpu',
-      value: 10,
-      dimensions: {host: 'server1', host_ip: '1.2.3.4'}
-    }];
-
-    this.setTimeout = 1050;
-    setTimeout(function () {
-      requestStub.yields(null, {statusCode: 200}, 'OK');
-      client.send({gauges: gauges});
-      client.queue.length.should.be.equal(1);
-
-      var expectedGauge = {
-        gauge: [{
-          metric: 'test.cpu',
-          value: 10,
-          dimensions: {
-            host: 'server1',
-            host_ip: '1.2.3.4',
-            dep1: 'dep1',
-            dep2: 'dep2',
-            AWSUniqueId: 'instance_region_account'
-          }
-        }]
-      };
-      var queue = client.queue;
-      var dataToSend = client._batchData(queue);
-      dataToSend.should.be.equal(JSON.stringify(expectedGauge));
-      done();
+      client.send({gauges: gauges}).then(function () {
+        client.AWSUniqueId.should.be.equal('instance_region_account');
+        client.globalDimensions.AWSUniqueId.should.be.equal('instance_region_account');
+        done();
+      });
     }, 1500);
 
   });
