@@ -42,7 +42,7 @@ Object `options` is optional and may contains following options:
 + **dimensions** - object, pre-defined dimensions for each datapoint and event
 + **ingestEndpoint** -  string
 + **apiEndpoint** - string
-+ **timeout** - number
++ **timeout** - number (in ms)
 + **batchSize** - number
 + **userAgents** - array
 
