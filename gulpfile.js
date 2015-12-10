@@ -40,5 +40,5 @@ gulp.task('test', ['pre-test'], function (cb) {
     });
 });
 
-gulp.task('prepublish', ['nsp']);
+gulp.task('prepublish');
 gulp.task('default', ['static', 'test']);

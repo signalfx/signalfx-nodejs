@@ -37,14 +37,14 @@ var client = new signalFx.SignalFx('MY_SIGNALFX_TOKEN' [, options]);
 // or create JSON client
 var clientJson = new signalFx.SignalFxJson('MY_SIGNALFX_TOKEN' [, options]);
 ```
-Object `options` is optional and may contains following options:
+Object `options` is an optional map and may contains following fields:
 + **enableAmazonUniqueId** - boolean, `false` by default. If `true`, library will retrieve Amazon unique identifier and set it as `AWSUniqueId` dimension for each datapoint and event. Use this option only if your application deployed to Amazon  
-+ **dimensions** - object, pre-defined dimensions for each datapoint and event
-+ **ingestEndpoint** -  string
-+ **apiEndpoint** - string
-+ **timeout** - number (in ms)
-+ **batchSize** - number
-+ **userAgents** - array
++ **dimensions** - object, pre-defined dimensions for each datapoint and event. This object has key-value format `{ dimension_name: dimension_value, ...}`
++ **ingestEndpoint** -  string, custom url to send datapoints in format http://custom.domain/api/path
++ **apiEndpoint** - string, custom url to send events in format http://custom.domain/api/path
++ **timeout** - number, sending datapoints timeout in ms (default is 1000ms)
++ **batchSize** - number, batch size to group sending datapoints 
++ **userAgents** - array of strings, items from this array will be added to 'user-agent' header separated by comma
 
 ### Reporting data
 
