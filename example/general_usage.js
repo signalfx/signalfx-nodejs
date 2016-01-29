@@ -4,7 +4,7 @@ var signalFx = require('../lib/signalfx');
 var token = 'YOUR SIGNALFX TOKEN'; // Replace with you token
 
 var client = new signalFx.SignalFx(token, {
-  enableAmazonUniqueId: true, // Retrieve and add Amazon unique identifier as dimension
+  enableAmazonUniqueId: false, // Set this parameter to `true` to retrieve and add Amazon unique identifier as dimension
   dimensions: {type: 'test.cust_dim'} // This dimension will be added to every datapoint and event
 });
 
@@ -38,7 +38,11 @@ function loop() {
       var properties = {version: version};
 
       // Send event
-      client.sendEvent('deployments', dimensions, properties);
+      client.sendEvent({category: client.EVENT_CATEGORIES.EXCEPTION,
+        eventType: 'deployments',
+        dimensions: dimensions,
+        properties: properties,
+        timestamp: timestamp});
     }
     counter += 1;
     loop();
