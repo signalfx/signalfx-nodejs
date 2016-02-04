@@ -76,7 +76,10 @@ describe('Integration test (Protobuf mode)', function () {
         instance: 'myinstance'
       };
       var properties = {version: version};
-      client.sendEvent('deployments', dimensions, properties);
+      client.sendEvent({category: 'EXCEPTION',
+        eventType: 'deployments',
+        dimensions: dimensions,
+        properties: properties});
     }
     counter += 1;
   });
@@ -120,14 +123,13 @@ describe('SignalFx client library (Protobuf mode)', function () {
   it('should be created with all parameters', function () {
     var token = 'my token';
     var ingestEndpoint = 'ingestEndpoint';
-    var apiEndpoint = 'apiEndpoint';
     var timeout = 3000;
     var batchSize = 301;
     var userAgents = 'TestCl';
 
     var client = new signalFx.SignalFx(token, {
       ingestEndpoint: ingestEndpoint,
-      apiEndpoint: apiEndpoint, timeout: timeout,
+      timeout: timeout,
       batchSize: batchSize, userAgents: userAgents
     });
 
@@ -135,7 +137,6 @@ describe('SignalFx client library (Protobuf mode)', function () {
 
     client.apiToken.should.be.equal(token);
     client.ingestEndpoint.should.be.equal(ingestEndpoint);
-    client.apiEndpoint.should.be.equal(apiEndpoint);
     client.batchSize.should.be.equal(batchSize);
     client.timeout.should.be.equal(timeout);
     client.userAgents.should.be.equal(userAgents);
@@ -213,7 +214,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
       value: 10
     }];
 
-    client.send({ gauges: gauges });
+    client.send({gauges: gauges});
 
     this.timeout(2020);
     setTimeout(function () {
@@ -230,6 +231,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
     var token = 'my token';
     var client = new signalFx.SignalFx(token);
 
+    var eventCategory = 'EXCEPTION';
     var version = 'version';
     var dimensions = {
       host: 'myhost',
@@ -237,7 +239,10 @@ describe('SignalFx client library (Protobuf mode)', function () {
       instance: 'myinstance'
     };
     var properties = {version: version};
-    client.sendEvent('deployments', dimensions, properties);
+    client.sendEvent({category: eventCategory,
+      eventType: 'deployments',
+      dimensions: dimensions,
+      properties: properties});
 
     this.timeout(1020);
     setTimeout(function () {
@@ -258,7 +263,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
       value: 10
     }];
 
-    client.send({ gauges: gauges });
+    client.send({gauges: gauges});
 
 
     this.timeout(1020);
@@ -281,7 +286,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
       value: 10
     }];
 
-    client.send({ gauges: gauges });
+    client.send({gauges: gauges});
 
     this.timeout(1020);
     setTimeout(function () {
@@ -319,14 +324,14 @@ describe('SignalFx client library (Protobuf mode)', function () {
     client.queue.length.should.be.equal(3);
 
     var expectedGauge = {
-        source: null, metric: 'test.cpu', timestamp: null, value: {intValue: 2}, metricType: 0, dimensions: []
+      source: null, metric: 'test.cpu', timestamp: null, value: {intValue: 2}, metricType: 0, dimensions: []
     };
     var expectedCounter = {
-        source: null, metric: 'cpu_cnt', timestamp: null, value: {intValue: 10}, metricType: 1, dimensions: []
+      source: null, metric: 'cpu_cnt', timestamp: null, value: {intValue: 10}, metricType: 1, dimensions: []
     };
     var expectedCounter2 = {
-        source: null, metric: 'cpu_cnt', timestamp: null, value: {doubleValue: 10.3}, metricType: 1, dimensions: []
-      };
+      source: null, metric: 'cpu_cnt', timestamp: null, value: {doubleValue: 10.3}, metricType: 1, dimensions: []
+    };
 
     var realGauge = client.queue[0];
     realGauge.metric.should.be.equal(expectedGauge.metric);
@@ -528,6 +533,63 @@ describe('SignalFx client library (Protobuf mode)', function () {
 
   });
 
+  it('Build event', function (done) {
+    var token = 'my token';
+    var client = new signalFx.SignalFx(token);
+
+    var eventCategory = 'EXCEPTION';
+    var eventType = 'deployment';
+    var version = 'version';
+    var dimensions = {
+      host: 'myhost',
+      service: 'myservice',
+      instance: 'myinstance'
+    };
+    var properties = {version: version, intVersion: 5};
+    var timestamp = (new Date()).getTime();
+    var event = {
+      category: eventCategory,
+      eventType: eventType,
+      dimensions: dimensions,
+      properties: properties,
+      timestamp: timestamp
+    };
+
+    var builtEvent = client._buildEvent(event);
+
+
+    builtEvent.category.should.be.equal(700000);
+    builtEvent.eventType.should.be.equal(eventType);
+    builtEvent.timestamp.should.be.equal(timestamp);
+
+    builtEvent.dimensions[0].key.should.not.be.empty;
+    builtEvent.dimensions[0].key.should.be.equal('host');
+    builtEvent.dimensions[0].value.should.not.be.empty;
+    builtEvent.dimensions[0].value.should.be.equal('myhost');
+
+    builtEvent.dimensions[1].key.should.not.be.empty;
+    builtEvent.dimensions[1].key.should.be.equal('service');
+    builtEvent.dimensions[1].value.should.not.be.empty;
+    builtEvent.dimensions[1].value.should.be.equal('myservice');
+
+    builtEvent.dimensions[2].key.should.not.be.empty;
+    builtEvent.dimensions[2].key.should.be.equal('instance');
+    builtEvent.dimensions[2].value.should.not.be.empty;
+    builtEvent.dimensions[2].value.should.be.equal('myinstance');
+
+    builtEvent.properties[0].key.should.not.be.empty;
+    builtEvent.properties[0].key.should.be.equal('version');
+    builtEvent.properties[0].value.strValue.should.not.be.empty;
+    builtEvent.properties[0].value.strValue.should.be.equal('version');
+
+    builtEvent.properties[1].key.should.not.be.empty;
+    builtEvent.properties[1].key.should.be.equal('intVersion');
+    builtEvent.properties[1].value.intValue.should.not.be.empty;
+    builtEvent.properties[1].value.intValue.should.be.equal(5);
+
+    done();
+  });
+
   it('should have Protobuf content type', function () {
     var token = 'my token';
     var client = new signalFx.SignalFx(token);
@@ -574,14 +636,13 @@ describe('SignalFx client library (Json mode)', function () {
   it('should be created with all parameters', function () {
     var token = 'my token';
     var ingestEndpoint = 'ingestEndpoint';
-    var apiEndpoint = 'apiEndpoint';
     var timeout = 3000;
     var batchSize = 301;
     var userAgents = 'TestCl';
 
     var client = new signalFx.SignalFxJson(token, {
       ingestEndpoint: ingestEndpoint,
-      apiEndpoint: apiEndpoint, timeout: timeout,
+      timeout: timeout,
       batchSize: batchSize, userAgents: userAgents
     });
 
@@ -589,7 +650,6 @@ describe('SignalFx client library (Json mode)', function () {
 
     client.apiToken.should.be.equal(token);
     client.ingestEndpoint.should.be.equal(ingestEndpoint);
-    client.apiEndpoint.should.be.equal(apiEndpoint);
     client.batchSize.should.be.equal(batchSize);
     client.timeout.should.be.equal(timeout);
     client.userAgents.should.be.equal(userAgents);
@@ -645,7 +705,7 @@ describe('SignalFx client library (Json mode)', function () {
       value: 10
     }];
 
-    client.send({ gauges: gauges });
+    client.send({gauges: gauges});
 
     this.timeout(1020);
     setTimeout(function () {
@@ -821,5 +881,118 @@ describe('SignalFx client library (Json mode)', function () {
     var client = new signalFx.SignalFxJson(token);
 
     client.getHeaderContentType().should.be.equal('application/json');
+  });
+
+  it('Send event', function (done) {
+    requestStub.yields(null, {statusCode: 200}, 'OK');
+
+    var token = 'my token';
+    var client = new signalFx.SignalFxJson(token);
+
+    var eventCategory = 'EXCEPTION';
+    var version = 'version';
+    var dimensions = {
+      host: 'myhost',
+      service: 'myservice',
+      instance: 'myinstance'
+    };
+    var properties = {version: version};
+    client.sendEvent({category: eventCategory,
+      eventType: 'deployments',
+      dimensions: dimensions,
+      properties: properties});
+
+    this.timeout(1020);
+    setTimeout(function () {
+      requestStub.called.should.be.equal(true);
+      done();
+    }, 1000);
+
+  });
+
+  it('Build event', function (done) {
+    var token = 'my token';
+    var client = new signalFx.SignalFxJson(token);
+
+    var eventCategory = 'EXCEPTION';
+    var eventType = 'deployment';
+    var version = 'version';
+    var dimensions = {
+      host: 'myhost',
+      service: 'myservice',
+      instance: 'myinstance'
+    };
+    var properties = {version: version};
+    var timestamp = (new Date()).getTime();
+    var event = {
+      category: eventCategory,
+      eventType: eventType,
+      dimensions: dimensions,
+      properties: properties,
+      timestamp: timestamp
+    };
+
+    var eventsList = [];
+    eventsList.push(event);
+    var expectedResult = JSON.stringify(eventsList);
+
+    var builtEvent = client._buildEvent(event);
+    builtEvent.should.be.equal(expectedResult);
+    done();
+  });
+
+});
+
+describe('SignalFx client library (General)', function () {
+
+  var requestStub;
+
+  before(function () {
+    mockery.enable({
+      warnOnReplace: false,
+      warnOnUnregistered: false,
+      useCleanCache: true
+    });
+
+    requestStub = sinon.stub();
+
+    // replace the module `request` with a stub object
+    mockery.registerMock('request', requestStub);
+
+    signalFx = require('../lib/signalfx');
+  });
+
+  after(function () {
+    mockery.disable();
+    mockery.deregisterAll();
+  });
+
+  it('Send event: throw error when event type is empty', function (done) {
+    var token = 'my token';
+    var client = new signalFx.SignalFx(token);
+
+    var eventCategory = 'EXCEPTION';
+    try {
+      client.sendEvent({category: eventCategory});
+    } catch (err) {
+      err.message.should.be.equal('Type of event should not be empty!');
+    }
+    done();
+
+  });
+
+  it('Send event: unsupported event category', function (done) {
+    var token = 'my token';
+    var client = new signalFx.SignalFx(token);
+
+    var eventCategory = 1;
+    var eventType = 'deployment';
+    try {
+      client.sendEvent({category: eventCategory, eventType: eventType});
+    } catch (err) {
+      err.message.should.be.equal('Unsupported event category: 1');
+    }
+    done();
+
   });
 });
