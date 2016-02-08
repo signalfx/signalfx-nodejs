@@ -1,4 +1,4 @@
-[![NPM version][npm-image]][npm-url] [![Build Status](https://travis-ci.org/signalfx/signalfx-nodejs.svg?branch=master)](https://travis-ci.org/signalfx/signalfx-nodejs)
+[![NPM version][npm-image]][npm-url] [![Circle CI](https://circleci.com/gh/signalfx/signalfx-nodejs.svg?style=svg)](https://circleci.com/gh/signalfx/signalfx-nodejs)
 # Node.js client library for SignalFx
 
 This is a programmatic interface in JavaScript for SignalFx's metadata and
