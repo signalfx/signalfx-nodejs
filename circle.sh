@@ -27,7 +27,8 @@ function do_test() {
 function do_deploy() {
   . "$HOME/circleutil/scripts/common.sh"
   (
-    echo "No deployment so far"
+    npm whoami
+    npm deploy
   )
 }
 

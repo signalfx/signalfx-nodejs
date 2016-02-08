@@ -11,3 +11,10 @@ test:
     - ./circle.sh test > >(tee $CIRCLE_ARTIFACTS/test.stdout.txt) 2> >(tee $CIRCLE_ARTIFACTS/test.stderr.txt >&2):
         parallel: true
         timeout: 3000
+
+deployment:
+  quay:
+    branch: [release]
+    commands:
+      - echo "_auth=$NPM_AUTH\nemail=info@signalfx.com" > ~/.npmrc
+      - ./circle.sh deploy
