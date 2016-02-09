@@ -1,0 +1,19 @@
+dependencies:
+  cache_directories:
+    - /home/ubuntu/dependent_repos
+    - /home/ubuntu/.npm
+  override:
+    - ./circle.sh cache > >(tee $CIRCLE_ARTIFACTS/cache.stdout.txt) 2> >(tee $CIRCLE_ARTIFACTS/cache.stderr.txt >&2):
+        timeout: 900
+ 
+test:
+  override:
+    - ./circle.sh test > >(tee $CIRCLE_ARTIFACTS/test.stdout.txt) 2> >(tee $CIRCLE_ARTIFACTS/test.stderr.txt >&2):
+        timeout: 3000
+
+deployment:
+  npmdeploy:
+    tag: /v[0-9]+(\.[0-9]+)*/
+    commands:
+      - echo -e "_auth=$NPM_AUTH\nemail=info@signalfx.com" > ~/.npmrc
+      - ./circle.sh deploy
