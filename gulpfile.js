@@ -50,7 +50,7 @@ gulp.task('browserify', function () {
     //do NOT bundle websockets because the browser will provide it
     .exclude('ws')
     .bundle()
-    .pipe(source('signalflow.js'))
+    .pipe(source('signalfx.js'))
     .pipe(gulp.dest('./build/'));
 });
 

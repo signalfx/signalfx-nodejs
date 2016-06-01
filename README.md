@@ -24,7 +24,7 @@ obtained from the SignalFx organization you want to report data into.
 
 ### Create client
 
-There are two ways to create a client object: 
+There are two ways to create an ingest client object: 
 
 + The default constructor `SignalFx`. This constructor uses Protobuf to send data to SignalFx. If it cannot send Protobuf, it falls back to sending JSON. 
 + The JSON constructor `SignalFxJson`. This constructor uses JSON format to send data to SignalFx.
@@ -33,9 +33,9 @@ There are two ways to create a client object:
 var signalfx = require('signalfx');
 
 // Create default client
-var client = new signalfx.SignalFx('MY_SIGNALFX_TOKEN' [, options]);
+var client = new signalfx.Ingest('MY_SIGNALFX_TOKEN' [, options]);
 // or create JSON client
-var clientJson = new signalfx.SignalFxJson('MY_SIGNALFX_TOKEN' [, options]);
+var clientJson = new signalfx.IngestJson('MY_SIGNALFX_TOKEN' [, options]);
 ```
 Object `options` is an optional map and may contains following fields:
 + **enableAmazonUniqueId** - boolean, `false` by default. If `true`, library will retrieve Amazon unique identifier and set it as `AWSUniqueId` dimension for each datapoint and event. Use this option only if your application deployed to Amazon  
@@ -229,7 +229,7 @@ Parameters to the execute method are as follows :
 + **program** (string) - Required field. The signalflow to be run.
 + **start** (int | string) - A milliseconds since epoch number or a string representing a relative time : e.g. -1h. Defaults to now.  
 + **end**  (int | string) - A milliseconds since epoch number or a string representing a relative time : e.g. -30m.  Defaults to infinity.
-+ **resolution (int) - The interval across which to calculate, in 1000 millisecond intervals.  Defaults to 1000. 
++ **resolution** (int) - The interval across which to calculate, in 1000 millisecond intervals.  Defaults to 1000. 
 + **maxdelay** (int) - The maximum time to wait for a datapoint to arirve, in 10000 millisecond intervals.  Defaults to dynamic.
 
 #### Computation Objects
@@ -243,21 +243,21 @@ The returned object from an execute call possesses the following methods:
 
 #### Usage in a browser:
 
-The signalflow package can be built for usage in a browser.  This is accomplished via the following commands.
+The signalflow client can be built for usage in a browser.  This is accomplished via the following commands.
 
 ```
 npm install
 gulp browserify
-The output can be found at ./build/signalflow.js
+The output can be found at ./build/signalfx.js
 ```
 
 It can then be loaded as usual via a script tag 
 
 ```
-<script src="build/signalflow.js" type="text/javascript"></script>
+<script src="build/signalfx.js" type="text/javascript"></script>
 ```
 
-Once loaded , a signalfx global will be created(window.signalfx).
+Once loaded , a signalfx global will be created(window.signalfx).  Note that only the SignalFlow package is included in this built file.
 
 
 ## License
