@@ -26,8 +26,8 @@ describe('Integration test (Protobuf mode)', function () {
     // replace the module `request` with a stub object
     mockery.registerMock('request', requestStub);
 
-    signalFx = require('../lib/signalfx');
-    client = new signalFx.SignalFx(token);
+    signalFx = require('../../lib/signalfx');
+    client = new signalFx.Ingest(token);
   });
 
   after(function () {
@@ -102,7 +102,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
     // replace the module `request` with a stub object
     mockery.registerMock('request', requestStub);
 
-    signalFx = require('../lib/signalfx');
+    signalFx = require('../../lib/signalfx');
   });
 
   after(function () {
@@ -112,11 +112,11 @@ describe('SignalFx client library (Protobuf mode)', function () {
 
   it('should be created', function () {
     var token = 'my token';
-    var client = new signalFx.SignalFx(token);
+    var client = new signalFx.Ingest(token);
     client.should.not.be.empty;
     client.apiToken.should.be.equal(token);
 
-    var isInstancedOfSignalFx = (client instanceof signalFx.SignalFx);
+    var isInstancedOfSignalFx = (client instanceof signalFx.Ingest);
     isInstancedOfSignalFx.should.be.equal(true);
   });
 
@@ -127,7 +127,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
     var batchSize = 301;
     var userAgents = 'TestCl';
 
-    var client = new signalFx.SignalFx(token, {
+    var client = new signalFx.Ingest(token, {
       ingestEndpoint: ingestEndpoint,
       timeout: timeout,
       batchSize: batchSize, userAgents: userAgents
@@ -141,7 +141,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
     client.timeout.should.be.equal(timeout);
     client.userAgents.should.be.equal(userAgents);
 
-    var isInstancedOfSignalFx = (client instanceof signalFx.SignalFx);
+    var isInstancedOfSignalFx = (client instanceof signalFx.Ingest);
     isInstancedOfSignalFx.should.be.equal(true);
   });
 
@@ -151,7 +151,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
     var token = 'my token';
     var enableAmazonUniqueId = true;
 
-    var client = new signalFx.SignalFxJson(token, {
+    var client = new signalFx.IngestJson(token, {
       enableAmazonUniqueId: enableAmazonUniqueId
     });
 
@@ -161,7 +161,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
     should.exist(client.globalDimensions[client.AWSUniqueId_DIMENTION_NAME]);
     client.globalDimensions[client.AWSUniqueId_DIMENTION_NAME].should.be.equal('instance_region_account');
 
-    var isInstancedOfSignalFx = (client instanceof signalFx.SignalFxJson);
+    var isInstancedOfSignalFx = (client instanceof signalFx.IngestJson);
     isInstancedOfSignalFx.should.be.equal(true);
   });
 
@@ -171,7 +171,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
     var token = 'my token';
     var enableAmazonUniqueId = true;
 
-    var client = new signalFx.SignalFxJson(token, {
+    var client = new signalFx.IngestJson(token, {
       enableAmazonUniqueId: enableAmazonUniqueId
     });
 
@@ -180,13 +180,13 @@ describe('SignalFx client library (Protobuf mode)', function () {
     client.AWSUniqueId.should.be.equal('');
     should.not.exist(client.globalDimensions[client.AWSUniqueId_DIMENTION_NAME]);
 
-    var isInstancedOfSignalFx = (client instanceof signalFx.SignalFxJson);
+    var isInstancedOfSignalFx = (client instanceof signalFx.IngestJson);
     isInstancedOfSignalFx.should.be.equal(true);
   });
 
   it('add datapoint to queue', function () {
     var token = 'my token';
-    var client = new signalFx.SignalFx(token);
+    var client = new signalFx.Ingest(token);
 
     client._addToQueue('gauge', {
       metric: 'test.cpu',
@@ -207,7 +207,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
     requestStub.yields(null, {statusCode: 200}, 'OK');
 
     var token = 'my token';
-    var client = new signalFx.SignalFx(token);
+    var client = new signalFx.Ingest(token);
 
     var gauges = [{
       metric: 'test.cpu',
@@ -229,7 +229,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
     requestStub.yields(null, {statusCode: 200}, 'OK');
 
     var token = 'my token';
-    var client = new signalFx.SignalFx(token);
+    var client = new signalFx.Ingest(token);
 
     var eventCategory = 'EXCEPTION';
     var version = 'version';
@@ -256,7 +256,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
     requestStub.yields(null, {statusCode: 401}, 'Unauthorized');
 
     var token = 'my token';
-    var client = new signalFx.SignalFx(token);
+    var client = new signalFx.Ingest(token);
 
     var gauges = [{
       metric: 'test.cpu',
@@ -279,7 +279,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
     requestStub.yields(null, {statusCode: 400}, '');
 
     var token = 'my token';
-    var client = new signalFx.SignalFx(token);
+    var client = new signalFx.Ingest(token);
 
     var gauges = [{
       metric: 'test.cpu',
@@ -300,7 +300,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
   it('Batch data (Protobuf)', function () {
 
     var token = 'my token';
-    var client = new signalFx.SignalFx(token);
+    var client = new signalFx.Ingest(token);
 
     client._addToQueue('gauge', {
       metric: 'test.cpu',
@@ -359,7 +359,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
   it('Dimensions (Protobuf)', function () {
 
     var token = 'my token';
-    var client = new signalFx.SignalFx(token);
+    var client = new signalFx.Ingest(token);
 
     client._addToQueue('gauge', {
       metric: 'test.cpu',
@@ -395,7 +395,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
   it('should have dimensions + predefined dimensions (Protobuf)', function () {
 
     var token = 'my token';
-    var client = new signalFx.SignalFx(token, {dimensions: {dep1: 'dep1', dep2: 'dep2'}});
+    var client = new signalFx.Ingest(token, {dimensions: {dep1: 'dep1', dep2: 'dep2'}});
 
     var gauges = [{
       metric: 'test.cpu',
@@ -446,7 +446,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
   it('should have only predefined dimensions (Protobuf)', function () {
 
     var token = 'my token';
-    var client = new signalFx.SignalFx(token, {dimensions: {dep1: 'dep1', dep2: 'dep2'}});
+    var client = new signalFx.Ingest(token, {dimensions: {dep1: 'dep1', dep2: 'dep2'}});
 
     var gauges = [{
       metric: 'test.cpu',
@@ -493,7 +493,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
     requestStub.yields(null, {statusCode: 200}, '{"region": "region", "instanceId": "instance", "accountId": "account"}');
 
     var token = 'my token';
-    var client = new signalFx.SignalFx(token, {enableAmazonUniqueId: true});
+    var client = new signalFx.Ingest(token, {enableAmazonUniqueId: true});
 
     var gauges = [{
       metric: 'test.cpu',
@@ -514,7 +514,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
     requestStub.yields(null, {statusCode: 200}, '{"region": "region", "instanceId": "instance", "accountId": "account"}');
 
     var token = 'my token';
-    var client = new signalFx.SignalFx(token, {enableAmazonUniqueId: true});
+    var client = new signalFx.Ingest(token, {enableAmazonUniqueId: true});
 
     var gauges = [{
       metric: 'test.cpu',
@@ -535,7 +535,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
 
   it('Build event', function (done) {
     var token = 'my token';
-    var client = new signalFx.SignalFx(token);
+    var client = new signalFx.Ingest(token);
 
     var eventCategory = 'EXCEPTION';
     var eventType = 'deployment';
@@ -592,7 +592,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
 
   it('should have Protobuf content type', function () {
     var token = 'my token';
-    var client = new signalFx.SignalFx(token);
+    var client = new signalFx.Ingest(token);
 
     client.getHeaderContentType().should.be.equal('application/x-protobuf');
   });
@@ -615,7 +615,7 @@ describe('SignalFx client library (Json mode)', function () {
     // replace the module `request` with a stub object
     mockery.registerMock('request', requestStub);
 
-    signalFx = require('../lib/signalfx');
+    signalFx = require('../../lib/signalfx');
   });
 
   after(function () {
@@ -625,11 +625,11 @@ describe('SignalFx client library (Json mode)', function () {
 
   it('should be created', function () {
     var token = 'my token';
-    var client = new signalFx.SignalFxJson(token);
+    var client = new signalFx.IngestJson(token);
     client.should.not.be.empty;
     client.apiToken.should.be.equal(token);
 
-    var isInstancedOfSignalFx = (client instanceof signalFx.SignalFxJson);
+    var isInstancedOfSignalFx = (client instanceof signalFx.IngestJson);
     isInstancedOfSignalFx.should.be.equal(true);
   });
 
@@ -640,7 +640,7 @@ describe('SignalFx client library (Json mode)', function () {
     var batchSize = 301;
     var userAgents = 'TestCl';
 
-    var client = new signalFx.SignalFxJson(token, {
+    var client = new signalFx.IngestJson(token, {
       ingestEndpoint: ingestEndpoint,
       timeout: timeout,
       batchSize: batchSize, userAgents: userAgents
@@ -654,7 +654,7 @@ describe('SignalFx client library (Json mode)', function () {
     client.timeout.should.be.equal(timeout);
     client.userAgents.should.be.equal(userAgents);
 
-    var isInstancedOfSignalFx = (client instanceof signalFx.SignalFxJson);
+    var isInstancedOfSignalFx = (client instanceof signalFx.IngestJson);
     isInstancedOfSignalFx.should.be.equal(true);
   });
 
@@ -664,20 +664,20 @@ describe('SignalFx client library (Json mode)', function () {
     var token = 'my token';
     var enableAmazonUniqueId = true;
 
-    var client = new signalFx.SignalFxJson(token, {
+    var client = new signalFx.IngestJson(token, {
       enableAmazonUniqueId: enableAmazonUniqueId
     });
 
     client.apiToken.should.be.equal(token);
     client.AWSUniqueId.should.be.equal('instance_region_account');
 
-    var isInstancedOfSignalFx = (client instanceof signalFx.SignalFxJson);
+    var isInstancedOfSignalFx = (client instanceof signalFx.IngestJson);
     isInstancedOfSignalFx.should.be.equal(true);
   });
 
   it('add datapoint to queue', function () {
     var token = 'my token';
-    var client = new signalFx.SignalFxJson(token);
+    var client = new signalFx.IngestJson(token);
 
     client._addToQueue('gauge', {
       metric: 'test.cpu',
@@ -698,7 +698,7 @@ describe('SignalFx client library (Json mode)', function () {
     requestStub.yields(null, {statusCode: 200}, 'OK');
 
     var token = 'my token';
-    var client = new signalFx.SignalFxJson(token);
+    var client = new signalFx.IngestJson(token);
 
     var gauges = [{
       metric: 'test.cpu',
@@ -718,7 +718,7 @@ describe('SignalFx client library (Json mode)', function () {
   it('Batch data (Json)', function () {
 
     var token = 'my token';
-    var client = new signalFx.SignalFxJson(token);
+    var client = new signalFx.IngestJson(token);
 
     client._addToQueue('gauge', {
       metric: 'test.cpu',
@@ -754,7 +754,7 @@ describe('SignalFx client library (Json mode)', function () {
   it('should have dimensions (Json)', function () {
 
     var token = 'my token';
-    var client = new signalFx.SignalFxJson(token);
+    var client = new signalFx.IngestJson(token);
 
     client._addToQueue('gauge', {
       metric: 'test.cpu',
@@ -773,7 +773,7 @@ describe('SignalFx client library (Json mode)', function () {
   it('should have dimensions + predefined dimensions (Json)', function () {
 
     var token = 'my token';
-    var client = new signalFx.SignalFxJson(token, {dimensions: {dep1: 'dep1', dep2: 'dep2'}});
+    var client = new signalFx.IngestJson(token, {dimensions: {dep1: 'dep1', dep2: 'dep2'}});
 
     var gauges = [{
       metric: 'test.cpu',
@@ -803,7 +803,7 @@ describe('SignalFx client library (Json mode)', function () {
   it('should have only predefined dimensions (Json)', function () {
 
     var token = 'my token';
-    var client = new signalFx.SignalFxJson(token, {dimensions: {dep1: 'dep1', dep2: 'dep2'}});
+    var client = new signalFx.IngestJson(token, {dimensions: {dep1: 'dep1', dep2: 'dep2'}});
 
     var gauges = [{
       metric: 'test.cpu',
@@ -832,7 +832,7 @@ describe('SignalFx client library (Json mode)', function () {
     requestStub.yields(null, {statusCode: 200}, '{"region": "region", "instanceId": "instance", "accountId": "account"}');
 
     var token = 'my token';
-    var client = new signalFx.SignalFxJson(token, {enableAmazonUniqueId: true});
+    var client = new signalFx.IngestJson(token, {enableAmazonUniqueId: true});
 
     var gauges = [{
       metric: 'test.cpu',
@@ -855,7 +855,7 @@ describe('SignalFx client library (Json mode)', function () {
     requestStub.yields(null, {statusCode: 200}, '{"region": "region", "instanceId": "instance", "accountId": "account"}');
 
     var token = 'my token';
-    var client = new signalFx.SignalFxJson(token, {enableAmazonUniqueId: true});
+    var client = new signalFx.IngestJson(token, {enableAmazonUniqueId: true});
 
     var gauges = [{
       metric: 'test.cpu',
@@ -878,7 +878,7 @@ describe('SignalFx client library (Json mode)', function () {
 
   it('should have Json content type', function () {
     var token = 'my token';
-    var client = new signalFx.SignalFxJson(token);
+    var client = new signalFx.IngestJson(token);
 
     client.getHeaderContentType().should.be.equal('application/json');
   });
@@ -887,7 +887,7 @@ describe('SignalFx client library (Json mode)', function () {
     requestStub.yields(null, {statusCode: 200}, 'OK');
 
     var token = 'my token';
-    var client = new signalFx.SignalFxJson(token);
+    var client = new signalFx.IngestJson(token);
 
     var eventCategory = 'EXCEPTION';
     var version = 'version';
@@ -912,7 +912,7 @@ describe('SignalFx client library (Json mode)', function () {
 
   it('Build event', function (done) {
     var token = 'my token';
-    var client = new signalFx.SignalFxJson(token);
+    var client = new signalFx.IngestJson(token);
 
     var eventCategory = 'EXCEPTION';
     var eventType = 'deployment';
@@ -959,7 +959,7 @@ describe('SignalFx client library (General)', function () {
     // replace the module `request` with a stub object
     mockery.registerMock('request', requestStub);
 
-    signalFx = require('../lib/signalfx');
+    signalFx = require('../../lib/signalfx');
   });
 
   after(function () {
@@ -969,7 +969,7 @@ describe('SignalFx client library (General)', function () {
 
   it('Send event: throw error when event type is empty', function (done) {
     var token = 'my token';
-    var client = new signalFx.SignalFx(token);
+    var client = new signalFx.Ingest(token);
 
     var eventCategory = 'EXCEPTION';
     try {
@@ -983,7 +983,7 @@ describe('SignalFx client library (General)', function () {
 
   it('Send event: unsupported event category', function (done) {
     var token = 'my token';
-    var client = new signalFx.SignalFx(token);
+    var client = new signalFx.Ingest(token);
 
     var eventCategory = 1;
     var eventType = 'deployment';

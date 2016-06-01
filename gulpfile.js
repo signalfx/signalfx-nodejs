@@ -6,6 +6,8 @@ var mocha = require('gulp-mocha');
 var istanbul = require('gulp-istanbul');
 var nsp = require('gulp-nsp');
 var plumber = require('gulp-plumber');
+var browserify = require('browserify');
+var source = require('vinyl-source-stream');
 
 gulp.task('static', function () {
   return gulp.src(['**/*.js', '!**/*protocol_buffers*.js'])
@@ -28,7 +30,7 @@ gulp.task('pre-test', function () {
 gulp.task('test', ['pre-test'], function (cb) {
   var mochaErr;
 
-  gulp.src('test/**/*.js')
+  gulp.src('test/signalflow/*.js')
     .pipe(plumber())
     .pipe(mocha({reporter: 'spec'})) // nyan
     .on('error', function (err) {
@@ -38,6 +40,18 @@ gulp.task('test', ['pre-test'], function (cb) {
     .on('end', function () {
       cb(mochaErr);
     });
+});
+
+gulp.task('browserify', function () {
+  //todo : minify
+  return browserify('./lib/client/signalflow/signalflow_client.js', { standalone: 'signalfx.signalflow' })
+    .exclude('bufferutil')
+    .exclude('utf-8-validate')
+    //do NOT bundle websockets because the browser will provide it
+    .exclude('ws')
+    .bundle()
+    .pipe(source('signalfxbrowser.js'))
+    .pipe(gulp.dest('./build/'));
 });
 
 gulp.task('prepublish');
