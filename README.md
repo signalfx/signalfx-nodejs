@@ -33,9 +33,9 @@ There are two ways to create a client object:
 var signalfx = require('signalfx');
 
 // Create default client
-var client = new signalFx.SignalFx('MY_SIGNALFX_TOKEN' [, options]);
+var client = new signalfx.SignalFx('MY_SIGNALFX_TOKEN' [, options]);
 // or create JSON client
-var clientJson = new signalFx.SignalFxJson('MY_SIGNALFX_TOKEN' [, options]);
+var clientJson = new signalfx.SignalFxJson('MY_SIGNALFX_TOKEN' [, options]);
 ```
 Object `options` is an optional map and may contains following fields:
 + **enableAmazonUniqueId** - boolean, `false` by default. If `true`, library will retrieve Amazon unique identifier and set it as `AWSUniqueId` dimension for each datapoint and event. Use this option only if your application deployed to Amazon  
@@ -52,7 +52,7 @@ This example shows how to report metrics to SignalFx, as gauges, counters, or cu
 ```js
 var signalfx = require('signalfx');
 
-var client = new signalFx.Ingest('MY_SIGNALFX_TOKEN');
+var client = new signalfx.Ingest('MY_SIGNALFX_TOKEN');
 
 client.send({
            cumulative_counters:[
@@ -83,7 +83,7 @@ Reporting dimensions for the data is also optional, and can be accomplished by s
 ```js
 var signalfx = require('signalfx');
 
-var client = new signalFx.Ingest('MY_SIGNALFX_TOKEN');
+var client = new signalfx.Ingest('MY_SIGNALFX_TOKEN');
 
 client.send({
           cumulative_counters:[
@@ -125,7 +125,7 @@ option from dictionary `client.EVENT_CATEGORIES`.
 ```js
 var signalfx = require('signalfx');
 
-var client = new signalFx.Ingest('MY_SIGNALFX_TOKEN');
+var client = new signalfx.Ingest('MY_SIGNALFX_TOKEN');
 
 client.sendEvent({
           category: '[event_category]',
@@ -148,7 +148,7 @@ var signalfx = require('signalfx');
 
 var myToken = 'MY_SIGNALFX_TOKEN';
 
-var client = new signalFx.Ingest(myToken);
+var client = new signalfx.Ingest(myToken);
 var gauges = [{
         metric: 'test.cpu',
         value: 10
@@ -168,7 +168,7 @@ var signalfx = require('signalfx');
 
 var myToken = '[MY_SIGNALFX_TOKEN]';
 
-var client = new signalFx.Ingest(myToken);
+var client = new signalfx.Ingest(myToken);
 
 var eventCategory = client.EVENT_CATEGORIES.USER_DEFINED
 var eventType = 'deployment'
@@ -192,13 +192,24 @@ $ node path/to/example/generic_usage.js
 ```
 
 
+## SignalFlow API
+
+### API access token
+
+To use the SignalFlow library, you need a SignalFx user access token, which can be
+obtained from the SignalFx via the REST API(https://developers.signalfx.com/docs/session)
+
+### SignalFlow 
+
+#### Examples 
+
 Complete code example for executing a computation
 ```js
 var signalfx = require('signalfx');
 
 var myToken = '[MY_SIGNALFX_TOKEN]';
 
-var client = new signalFx.SignalFlow(myToken);
+var client = new signalfx.SignalFlow(myToken);
 
 var handle = client.execute({
             program: "data('jvm.cpu.load').mean().publish()",
@@ -208,6 +219,46 @@ var handle = client.execute({
         
 handle.stream(function(e) { console.log(e); });
 ```
+
+Please note that a token created via the REST API is necessary to use this API.  API Access tokens intended for ingest are not allowed.
+
+#### API Options
+
+Parameters to the execute method are as follows :
+
++ **program** (string) - Required field. The signalflow to be run.
++ **start** (int | string) - A milliseconds since epoch number or a string representing a relative time : e.g. -1h. Defaults to now.  
++ **end**  (int | string) - A milliseconds since epoch number or a string representing a relative time : e.g. -30m.  Defaults to infinity.
++ **resolution (int) - The interval across which to calculate, in 1000 millisecond intervals.  Defaults to 1000. 
++ **maxdelay** (int) - The maximum time to wait for a datapoint to arirve, in 10000 millisecond intervals.  Defaults to dynamic.
+
+#### Computation Objects
+
+The returned object from an execute call possesses the following methods:
+
++ **stream** (function) - accepts a function and will call the function with computation messages when available.
++ **close** () - terminates the computation.
++ **get_known_tsids** () - gets all known timeseries ID's for the current computation
++ **get_metadata** (string) - gets the metadata message associated with the specific timeseries ID.
+
+#### Usage in a browser:
+
+The signalflow package can be built for usage in a browser.  This is accomplished via the following commands.
+
+```
+npm install
+gulp browserify
+The output can be found at ./build/signalflow.js
+```
+
+It can then be loaded as usual via a script tag 
+
+```
+<script src="build/signalflow.js" type="text/javascript"></script>
+```
+
+Once loaded , a signalfx global will be created(window.signalfx).
+
 
 ## License
 

@@ -44,13 +44,13 @@ gulp.task('test', ['pre-test'], function (cb) {
 
 gulp.task('browserify', function () {
   //todo : minify
-  return browserify('./lib/client/signalflow/signalflow_client.js', { standalone: 'signalfx.signalflow' })
+  return browserify('./lib/client/signalflow/signalflow_client.js', { standalone: 'signalfx.SignalFlow' })
     .exclude('bufferutil')
     .exclude('utf-8-validate')
     //do NOT bundle websockets because the browser will provide it
     .exclude('ws')
     .bundle()
-    .pipe(source('signalfxbrowser.js'))
+    .pipe(source('signalflow.js'))
     .pipe(gulp.dest('./build/'));
 });
 

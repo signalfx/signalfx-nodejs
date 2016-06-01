@@ -3,7 +3,7 @@ var signalFx = require('../lib/signalfx');
 
 var token = 'YOUR SIGNALFX TOKEN'; // Replace with you token
 
-var client = new signalFx.SignalFx(token, {
+var client = new signalFx.Ingest(token, {
   enableAmazonUniqueId: false, // Set this parameter to `true` to retrieve and add Amazon unique identifier as dimension
   dimensions: {type: 'test.cust_dim'} // This dimension will be added to every datapoint and event
 });
