@@ -212,12 +212,12 @@ var myToken = '[MY_SIGNALFX_TOKEN]';
 var client = new signalfx.SignalFlow(myToken);
 
 var handle = client.execute({
-            program: "data('jvm.cpu.load').mean().publish()",
+            program: "data('cpu.utilization').mean().publish()",
             start: Date.now() - 60000,
             stop: Date.now() + 60000,
             resolution: 10000});
         
-handle.stream(function(e) { console.log(e); });
+handle.stream(function(err, data) { console.log(data); });
 ```
 
 Please note that a token created via the REST API is necessary to use this API.  API Access tokens intended for ingest are not allowed.
@@ -230,16 +230,64 @@ Parameters to the execute method are as follows :
 + **start** (int | string) - A milliseconds since epoch number or a string representing a relative time : e.g. -1h. Defaults to now.  
 + **end**  (int | string) - A milliseconds since epoch number or a string representing a relative time : e.g. -30m.  Defaults to infinity.
 + **resolution** (int) - The interval across which to calculate, in 1000 millisecond intervals.  Defaults to 1000. 
-+ **maxdelay** (int) - The maximum time to wait for a datapoint to arirve, in 10000 millisecond intervals.  Defaults to dynamic.
++ **maxDelay** (int) - The maximum time to wait for a datapoint to arrive, in 10000 millisecond intervals.  Defaults to dynamic.
++ **bigNumber** (boolean) - True if returned values require precision beyond MAX_SAFE_INTEGER.  Returns all values in data messages as bignumber objects as per https://www.npmjs.com/package/bignumber.js  Defaults to false.
 
 #### Computation Objects
 
 The returned object from an execute call possesses the following methods:
 
-+ **stream** (function) - accepts a function and will call the function with computation messages when available.
++ **stream** (function (err, data)) - accepts a function and will call the function with computation messages when available.  It returns multiple types of messages, detailed below.  This follows error first callback conventions, so data is returned in the second argument if no errors occurred.
 + **close** () - terminates the computation.
 + **get_known_tsids** () - gets all known timeseries ID's for the current computation
 + **get_metadata** (string) - gets the metadata message associated with the specific timeseries ID.
+
+#### Stream Message Types 
++ Metadata
+```js
+{
+  type : "metadata",
+  channel : "<CHID>",
+  properties : {
+    sf_key : [<String>]
+    sf_metric: <String>
+    ...
+  }, 
+  tsId : "<ID>"
+}
+```
++ Data
+```js
+{
+  type : "data",
+  channel : "<CHID>",
+  data : [
+    {
+      tsId : "<ID>",
+      value : <Number>
+    }, 
+    ...
+  ],
+  logicalTimestampMs : <Number>
+}
+```
++ Event
+```js
+{
+  tsId : "<ID>",
+  timestampMs: 1461353198000,
+  channel: "<CHID>"",
+  type: "event",
+  properties: {
+    incidentId: "<ID>",
+    "inputValues" : "{\"a\":4}",
+    was: "ok",
+    is: "anomalous"
+  }
+}
+```
+
+More information about messages can be found at https://developers.signalfx.com/v2/docs/stream-messages-specification
 
 #### Usage in a browser:
 
@@ -257,7 +305,7 @@ It can then be loaded as usual via a script tag
 <script src="build/signalfx.js" type="text/javascript"></script>
 ```
 
-Once loaded , a signalfx global will be created(window.signalfx).  Note that only the SignalFlow package is included in this built file.
+Once loaded, a signalfx global will be created(window.signalfx).  Note that only the SignalFlow package is included in this built file.
 
 
 ## License
