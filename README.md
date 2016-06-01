@@ -11,7 +11,7 @@ to interact with SignalFx or report metric and event data to SignalFx.
 
 To install using npm:
 ```sh
-$ npm install signalfx --save-dev
+$ npm install signalfx
 ```
 
 
