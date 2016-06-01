@@ -52,7 +52,7 @@ This example shows how to report metrics to SignalFx, as gauges, counters, or cu
 ```js
 var signalfx = require('signalfx');
 
-var client = new signalFx.SignalFx('MY_SIGNALFX_TOKEN');
+var client = new signalFx.Ingest('MY_SIGNALFX_TOKEN');
 
 client.send({
            cumulative_counters:[
@@ -83,7 +83,7 @@ Reporting dimensions for the data is also optional, and can be accomplished by s
 ```js
 var signalfx = require('signalfx');
 
-var client = new signalFx.SignalFx('MY_SIGNALFX_TOKEN');
+var client = new signalFx.Ingest('MY_SIGNALFX_TOKEN');
 
 client.send({
           cumulative_counters:[
@@ -125,7 +125,7 @@ option from dictionary `client.EVENT_CATEGORIES`.
 ```js
 var signalfx = require('signalfx');
 
-var client = new signalFx.SignalFx('MY_SIGNALFX_TOKEN');
+var client = new signalFx.Ingest('MY_SIGNALFX_TOKEN');
 
 client.sendEvent({
           category: '[event_category]',
@@ -148,7 +148,7 @@ var signalfx = require('signalfx');
 
 var myToken = 'MY_SIGNALFX_TOKEN';
 
-var client = new signalFx.SignalFx(myToken);
+var client = new signalFx.Ingest(myToken);
 var gauges = [{
         metric: 'test.cpu',
         value: 10
@@ -168,7 +168,7 @@ var signalfx = require('signalfx');
 
 var myToken = '[MY_SIGNALFX_TOKEN]';
 
-var client = new signalFx.SignalFx(myToken);
+var client = new signalFx.Ingest(myToken);
 
 var eventCategory = client.EVENT_CATEGORIES.USER_DEFINED
 var eventType = 'deployment'
@@ -189,6 +189,24 @@ Set your SignalFx token and run example
 
 ```sh
 $ node path/to/example/generic_usage.js
+```
+
+
+Complete code example for executing a computation
+```js
+var signalfx = require('signalfx');
+
+var myToken = '[MY_SIGNALFX_TOKEN]';
+
+var client = new signalFx.SignalFlow(myToken);
+
+var handle = client.execute({
+            program: "data('jvm.cpu.load').mean().publish()",
+            start: Date.now() - 60000,
+            stop: Date.now() + 60000,
+            resolution: 10000});
+        
+handle.stream(function(e) { console.log(e); });
 ```
 
 ## License
