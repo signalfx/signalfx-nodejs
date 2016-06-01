@@ -26,8 +26,8 @@ obtained from the SignalFx organization you want to report data into.
 
 There are two ways to create an ingest client object: 
 
-+ The default constructor `SignalFx`. This constructor uses Protobuf to send data to SignalFx. If it cannot send Protobuf, it falls back to sending JSON. 
-+ The JSON constructor `SignalFxJson`. This constructor uses JSON format to send data to SignalFx.
++ The default constructor `Ingest`. This constructor uses Protobuf to send data to SignalFx. If it cannot send Protobuf, it falls back to sending JSON. 
++ The JSON constructor `IngestJson`. This constructor uses JSON format to send data to SignalFx.
 
 ```js
 var signalfx = require('signalfx');
@@ -276,7 +276,7 @@ The returned object from an execute call possesses the following methods:
 {
   tsId : "<ID>",
   timestampMs: 1461353198000,
-  channel: "<CHID>"",
+  channel: "<CHID>",
   type: "event",
   properties: {
     incidentId: "<ID>",
