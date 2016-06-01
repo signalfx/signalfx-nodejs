@@ -30,7 +30,7 @@ gulp.task('pre-test', function () {
 gulp.task('test', ['pre-test'], function (cb) {
   var mochaErr;
 
-  gulp.src('test/signalflow/*.js')
+  gulp.src('test/**/*.js')
     .pipe(plumber())
     .pipe(mocha({reporter: 'spec'})) // nyan
     .on('error', function (err) {
