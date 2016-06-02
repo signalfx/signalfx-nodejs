@@ -289,13 +289,13 @@ The returned object from an execute call possesses the following methods:
 
 More information about messages can be found at https://developers.signalfx.com/v2/docs/stream-messages-specification
 
-#### Usage in a browser:
+#### Usage in a Web Browser
 
 The signalflow client can be built for usage in a browser.  This is accomplished via the following commands.
 
 ```
-npm install
-gulp browserify
+$ npm install
+$ gulp browserify
 The output can be found at ./build/signalfx.js
 ```
 
@@ -307,6 +307,24 @@ It can then be loaded as usual via a script tag
 
 Once loaded, a signalfx global will be created(window.signalfx).  Note that only the SignalFlow package is included in this built file.
 
+#### Browser Usage Example using D3
+
+First ensure your current working directory is the root of the nodejs repository clone, then do the following :
+
+Make the following changes to example/index.html
+```
+replace 'YOUR USER TOKEN' with your own token.
+replace 'cpu.utilization' with an appropriate metric as necessary.
+```
+
+Execute the following commands 
+```
+$ npm install
+$ gulp browserify
+$ node example/server.js
+```
+
+Finally, open http://localhost:8888/example/index.html
 
 ## License
 

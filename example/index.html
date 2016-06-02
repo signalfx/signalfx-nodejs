@@ -1,0 +1,142 @@
+<html>
+  <head>
+    <script src="../build/signalfx.js" type="text/javascript"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+
+    <style>
+      body {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      }
+
+      .graph .axis {
+        stroke-width: 1;
+      }
+
+      .graph .axis .tick line {
+        stroke: black;
+      }
+
+      .graph .axis .tick text {
+        fill: black;
+        font-size: 0.7em;
+      }
+
+      .graph .axis .domain {
+        fill: none;
+        stroke: black;
+      }
+
+      .graph .group {
+        fill: none;
+        stroke: black;
+        stroke-width: 1.5;
+      }
+      </style>
+  </head>
+
+  <body>
+    <div class="graph"></div>
+    <script>
+      var limit = 10,
+        duration = 10000,
+        animDuration = 500,
+        now = new Date(Date.now() - duration);
+
+      var width = 500,
+        height = 200;
+
+      var groups = {};
+
+      var x = d3.time.scale()
+        .domain([now - (limit - 2), now - duration])
+        .range([0, width]);
+
+      var y = d3.scale.linear()
+        .domain([0, 100])
+        .range([height, 0]);
+
+      var line = d3.svg.line()
+        .interpolate('basis')
+        .x(function(d, i) {
+          return x(now - (limit - i) * duration)
+        })
+        .y(function(d) {
+          return y(d)
+        });
+
+      var svg = d3.select('.graph').append('svg')
+        .attr('class', 'chart')
+        .attr('width', width)
+        .attr('height', height + 50);
+
+      var axis = svg.append('g')
+        .attr('class', 'x axis')
+        .attr('transform', 'translate(0,' + height + ')')
+        .call(x.axis = d3.svg.axis().scale(x).orient('bottom'));
+
+      var paths = svg.append('g');
+
+      function addGroup (name) {
+        var group = groups[name];
+        group.path = paths.append('path')
+          .data([group.data])
+          .attr('class', name + ' group')
+          .style('stroke', group.color);
+      }
+
+      function tick() {
+        now = new Date();
+
+        // Shift domain
+        x.domain([now - limit * duration, now - duration]);
+
+        // Slide x-axis left
+        axis.transition()
+          .duration(animDuration)
+          .ease('linear')
+          .call(x.axis);
+
+        // Slide paths left
+        paths.attr('transform', null)
+          .transition()
+          .duration(animDuration)
+          .ease('linear')
+          .attr('transform', 'translate(' + x(now - limit * duration) + ')');
+          //.each('end', tick);
+
+        for (var name in groups) {
+          var group = groups[name];
+          group.data.shift()
+        }
+      }
+
+      var token = 'YOUR USER TOKEN';
+
+      var sfxClient = signalfx.SignalFlow(token);
+
+      var j1 = sfxClient.execute({
+        program: "data('cpu.utilization').publish()",
+        start: Date.now() - 10*10000,
+        resolution: 10000
+      });
+
+      j1.stream(function (err, data) {
+        if(!err) {
+          if ( data.type === signalfx.CONSTANTS.MESSAGE_TYPES.METADATA ) {
+            data.data = d3.range(limit).map(function() {
+              return 0;
+            });
+            groups[data.tsId] = data;
+            addGroup(data.tsId);
+          } else if ( data.type === signalfx.CONSTANTS.MESSAGE_TYPES.DATA) {
+            data.data.forEach(function (datapoint) {
+              groups[datapoint.tsId].data.push(datapoint.value);
+              groups[datapoint.tsId].path.attr('d', line);
+            });
+            tick();
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
