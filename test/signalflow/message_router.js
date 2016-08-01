@@ -223,7 +223,7 @@ function getJobMessages() {
       version: 1,
       messageType: 5,
       logicalTimestampMs: 1462845657000,
-      data: [{tsId: 'AAAAAOQElGM', value: new BigNumber(22.06513496503497)},{tsId: 'AAAAAOQElGZ', value: new BigNumber(29.06513496503497)}]
+      data: [{tsId: 'AAAAAOQElGM', value: new BigNumber(22.06513496503497)}, {tsId: 'AAAAAOQElGZ', value: new BigNumber(29.06513496503497)}]
     },
     {
       type: 'data',

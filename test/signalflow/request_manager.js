@@ -19,7 +19,7 @@ describe('The SignalFlow Request Manager', function () {
 
   xit('should attempt to authenticate when called', function (done) {
     //need to figure out how to implement this.
-    var handle = client.authenticate('MYSESSIONTOKEN');
+    //var handle = client.authenticate('MYSESSIONTOKEN');
     done();
   });
 
