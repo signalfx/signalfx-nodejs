@@ -9,6 +9,7 @@ BigNumber.config({ ERRORS: false });
 function getJobMessages() {
   // the job message handler directly modifies messages when packaging batches, so data needs to be
   // reset before each test.
+  // note that this message stream represents two publish blocks, one that has 2 mts, and one that has only 1 mts.
   return [
     {
       channel: 'R0',
@@ -40,12 +41,28 @@ function getJobMessages() {
       type: 'metadata'
     },
     {
+      channel: 'R0',
+      tsId: 'AAAAAOQElGZ',
+      properties: {
+        jobId: 'CiDsZWZAIAw',
+        sf_organizationID: 'BqDQY5OAAAA',
+        sf_key: ['jobId', 'sf_originatingMetric', 'sf_metric'],
+        sf_streamLabel: 'mean',
+        sf_metric: '__SF_COMP_CiDsZWZAIAw_02-PUBLISH_metric',
+        sf_resolutionMs: 1000,
+        sf_type: 'MetricTimeSeries',
+        sf_originatingMetric: 'jvm.cpu.load',
+        sf_isPreQuantized: true
+      },
+      type: 'metadata'
+    },
+    {
       type: 'data',
       channel: 'R0',
       version: 1,
       messageType: 5,
       logicalTimestampMs: 1462845656000,
-      data: [{tsId: 'AAAAAOQElGM', value: new BigNumber(22.06513496503497)}]
+      data: [{tsId: 'AAAAAOQElGM', value: new BigNumber(22.06513496503497)}, {tsId: 'AAAAAOQElGZ', value: new BigNumber(39.06513496503497)}]
     },
     {
       channel: 'R0',
@@ -206,7 +223,7 @@ function getJobMessages() {
       version: 1,
       messageType: 5,
       logicalTimestampMs: 1462845657000,
-      data: [{tsId: 'AAAAAOQElGM', value: new BigNumber(22.06513496503497)}]
+      data: [{tsId: 'AAAAAOQElGM', value: new BigNumber(22.06513496503497)},{tsId: 'AAAAAOQElGZ', value: new BigNumber(29.06513496503497)}]
     },
     {
       type: 'data',
@@ -235,7 +252,7 @@ describe('routed message handler properly determines job state', function () {
         });
 
         it('should properly batch data messages into the correct size', function () {
-          msg.data.length.should.be.equal(2);
+          msg.data.length.should.be.equal(3);
         });
 
         it('should return regular js numbers', function () {
@@ -257,10 +274,14 @@ describe('routed message handler properly determines job state', function () {
   };
 
   var inst = rmh(params, onMessage);
-  jobMessages.forEach(inst);
+  jobMessages.forEach(inst.onMessage);
 
   it('should return every metadata message sent', function () {
-    numMetaDataMessages.should.be.equal(2);
+    numMetaDataMessages.should.be.equal(3);
+  });
+
+  it('should keep track of the latest message timestamp', function () {
+    inst.getLatestBatchTimeStamp().should.be.equal(1462845657000);
   });
 });
 
@@ -290,7 +311,7 @@ describe('routed message handler properly returns big numbers', function () {
     bigNumber: true
   };
   var inst = rmh(params, onMessage);
-  jobMessages.forEach(inst);
+  jobMessages.forEach(inst.onMessage);
 });
 
 
