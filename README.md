@@ -209,7 +209,7 @@ var signalfx = require('signalfx');
 
 var myToken = '[MY_SIGNALFX_TOKEN]';
 
-var client = new signalfx.SignalFlow(myToken);
+var client = new signalfx.streamer.SignalFlow(myToken);
 
 var handle = client.execute({
             program: "data('cpu.utilization').mean().publish()",

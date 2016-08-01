@@ -112,7 +112,7 @@
 
       var token = 'YOUR USER TOKEN';
 
-      var sfxClient = signalfx.SignalFlow(token);
+      var sfxClient = signalfx.streamer.SignalFlow(token);
 
       var j1 = sfxClient.execute({
         program: "data('cpu.utilization').publish()",
@@ -122,13 +122,13 @@
 
       j1.stream(function (err, data) {
         if(!err) {
-          if ( data.type === signalfx.CONSTANTS.MESSAGE_TYPES.METADATA ) {
+          if ( data.type === signalfx.streamer.CONSTANTS.MESSAGE_TYPES.METADATA ) {
             data.data = d3.range(limit).map(function() {
               return 0;
             });
             groups[data.tsId] = data;
             addGroup(data.tsId);
-          } else if ( data.type === signalfx.CONSTANTS.MESSAGE_TYPES.DATA) {
+          } else if ( data.type === signalfx.streamer.CONSTANTS.MESSAGE_TYPES.DATA) {
             data.data.forEach(function (datapoint) {
               groups[datapoint.tsId].data.push(datapoint.value);
               groups[datapoint.tsId].path.attr('d', line);

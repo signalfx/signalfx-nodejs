@@ -44,7 +44,7 @@ gulp.task('test', ['pre-test'], function (cb) {
 
 gulp.task('browserify', function () {
   //todo : minify
-  return browserify('./lib/signalfx_browser.js', { standalone: 'signalfx' })
+  return browserify('./lib/signalfx_browser.js', { standalone: 'signalfx.streamer' })
     .exclude('bufferutil')
     .exclude('utf-8-validate')
     //do NOT bundle websockets because the browser will provide it
