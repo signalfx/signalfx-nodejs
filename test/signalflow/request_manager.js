@@ -33,7 +33,8 @@ describe('The SignalFlow Request Manager', function () {
       maxDelay: 1000
     }, cb);
     expect(client.stop(handle)).to.equal(true);
-    expect(client.stop('R999')).to.equal(false);
+    //stops on unknown handles fail silently
+    expect(client.stop('R999')).to.equal(true);
     done();
   });
 });
