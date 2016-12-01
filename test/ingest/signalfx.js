@@ -3,7 +3,7 @@
 
 var sinon = require('sinon');
 var mockery = require('mockery');
-var request = require('request');
+require('request');
 var should = require('chai').should();
 
 var signalFx;

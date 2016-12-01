@@ -37,4 +37,15 @@ describe('The SignalFlow Request Manager', function () {
     expect(client.stop('R999')).to.equal(true);
     done();
   });
+
+  it('should return a request handle when execute is called for "explain", and remove from execute queue when stopped', function (done) {
+    function cb() {}
+    var handle = client.execute({
+      incidentId: 'ABCDEFGHI'
+    }, cb, null, 'explain');
+    expect(client.stop(handle)).to.equal(true);
+    //stops on unknown handles fail silently
+    expect(client.stop('R999')).to.equal(true);
+    done();
+  });
 });
