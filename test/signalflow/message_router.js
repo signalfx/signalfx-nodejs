@@ -3,7 +3,7 @@
 
 var rmh = require('../../lib/client/signalflow/message_router.js');
 var BigNumber = require('bignumber.js');
-var should = require('chai').should();
+require('chai').should();
 BigNumber.config({ ERRORS: false });
 
 function getJobMessages() {
