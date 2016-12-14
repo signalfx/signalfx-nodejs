@@ -45,8 +45,8 @@ describe('it should properly unpack binary float messages', function () {
   });
 
   var outputMsg = wsmh.parseWebSocketMessage({ data: arrBuff}, {
-    'R0' : {
-      params : {
+    R0: {
+      params: {
       }
     }
   });
@@ -76,9 +76,9 @@ describe('it should properly unpack negative binary integer messages', function 
   });
 
   var bigNumberOutputMsg = wsmh.parseWebSocketMessage({ data: arrBuff}, {
-    'R0' : {
-      params : {
-        bigNumber : true
+    R0: {
+      params: {
+        bigNumber: true
       }
     }
   });
@@ -99,9 +99,9 @@ describe('it should properly unpack positive binary integer messages', function 
   });
 
   var bigNumberOutputMsg = wsmh.parseWebSocketMessage({ data: arrBuff}, {
-    'R0' : {
-      params : {
-        bigNumber : true
+    R0: {
+      params: {
+        bigNumber: true
       }
     }
   });
