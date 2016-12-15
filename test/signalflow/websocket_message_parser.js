@@ -44,11 +44,15 @@ describe('it should properly unpack binary float messages', function () {
     typedArr[idx] = val;
   });
 
-  var outputMsg = wsmh.parseWebSocketMessage({ data: arrBuff});
-  var bigNumberOutputMsg = wsmh.parseWebSocketMessage({ data: arrBuff}, true);
+  var outputMsg = wsmh.parseWebSocketMessage({ data: arrBuff}, {
+    R0: {
+      params: {
+      }
+    }
+  });
 
-  it('should unpack floats correctly', function () {
-    expect(outputMsg.data[0].value.toNumber()).to.equal(9.831329591208355);
+  it('should unpack floats correctly and return a regular number when bigNumber is not set', function () {
+    expect(outputMsg.data[0].value).to.equal(9.831329591208355);
   });
 
   it('should detect binary message types correctly', function () {
@@ -57,10 +61,6 @@ describe('it should properly unpack binary float messages', function () {
 
   it('should return the correct timestamp', function () {
     expect(outputMsg.logicalTimestampMs === 1462904132000).to.equal(true);
-  });
-
-  it('should always return big numbers when requested', function () {
-    expect(typeof bigNumberOutputMsg.data[0].value).to.equal('object');
   });
 });
 
@@ -75,7 +75,13 @@ describe('it should properly unpack negative binary integer messages', function 
     typedArr[idx] = val;
   });
 
-  var bigNumberOutputMsg = wsmh.parseWebSocketMessage({ data: arrBuff});
+  var bigNumberOutputMsg = wsmh.parseWebSocketMessage({ data: arrBuff}, {
+    R0: {
+      params: {
+        bigNumber: true
+      }
+    }
+  });
 
   it('should unpack negative integers correctly, not losing precision in big number mode', function () {
     expect(bigNumberOutputMsg.data[0].value.toString()).to.equal('-9620000000000001');
@@ -92,7 +98,13 @@ describe('it should properly unpack positive binary integer messages', function 
     typedArr[idx] = val;
   });
 
-  var bigNumberOutputMsg = wsmh.parseWebSocketMessage({ data: arrBuff});
+  var bigNumberOutputMsg = wsmh.parseWebSocketMessage({ data: arrBuff}, {
+    R0: {
+      params: {
+        bigNumber: true
+      }
+    }
+  });
 
   it('should unpack negative integers correctly, not losing precision in big number mode', function () {
     expect(bigNumberOutputMsg.data[0].value.toString()).to.equal('962000000000000001');

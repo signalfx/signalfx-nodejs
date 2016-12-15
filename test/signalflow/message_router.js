@@ -223,7 +223,7 @@ function getJobMessages() {
       version: 1,
       messageType: 5,
       logicalTimestampMs: 1462845657000,
-      data: [{tsId: 'AAAAAOQElGM', value: new BigNumber(22.06513496503497)}, {tsId: 'AAAAAOQElGZ', value: new BigNumber(29.06513496503497)}]
+      data: [{tsId: 'AAAAAOQElGM', value: 22.06513496503497}, {tsId: 'AAAAAOQElGZ', value: 29.06513496503497}]
     },
     {
       type: 'data',
@@ -231,7 +231,7 @@ function getJobMessages() {
       version: 1,
       messageType: 5,
       logicalTimestampMs: 1462845657000,
-      data: [{tsId: 'AAAAAJ5grV4', value: new BigNumber(82.06513496503497)}]
+      data: [{tsId: 'AAAAAJ5grV4', value: 82.06513496503497}]
     }
   ];
 }
@@ -253,10 +253,6 @@ describe('routed message handler properly determines job state', function () {
 
         it('should properly batch data messages into the correct size', function () {
           msg.data.length.should.be.equal(3);
-        });
-
-        it('should return regular js numbers', function () {
-          (typeof msg.data[0].value).should.be.equal('number');
         });
       break;
       case 'metadata':
@@ -284,34 +280,3 @@ describe('routed message handler properly determines job state', function () {
     inst.getLatestBatchTimeStamp().should.be.equal(1462845657000);
   });
 });
-
-jobMessages = getJobMessages();
-describe('routed message handler properly returns big numbers', function () {
-  var numMetaDataMessages = 0;
-  var knownEmitters = {};
-  function onMessage(msg) {
-    switch (msg.type) {
-      case 'data':
-        it('should return bignumbers', function () {
-          (typeof msg.data[0].value).should.be.equal('object');
-        });
-        break;
-      case 'metadata':
-        knownEmitters[msg.tsId] = msg;
-        numMetaDataMessages++;
-        break;
-      case 'event':
-        break;
-      default:
-        break;
-    }
-  }
-  var params = {
-    program: 'data(\'jvm.cpu.load\').mean().stream(label=\'mean\')\ndata(\'jvm.cpu.load\').max().stream(label=\'max\')',
-    bigNumber: true
-  };
-  var inst = rmh(params, onMessage);
-  jobMessages.forEach(inst.onMessage);
-});
-
-
