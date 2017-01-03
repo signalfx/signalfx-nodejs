@@ -147,3 +147,101 @@ describe('it should properly unpack positive binary integer messages', function 
     expect(bigNumberOutputMsg.data[0].value.toString()).to.equal('962000000000000001');
   });
 });
+
+describe('it should unpack the max delay value correctly', function () {
+  var originalMsg = [2, 0, 5, 0, 82, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 1, 84, 186, 1, 162, 176, 0, 0, 0, 0, 0, 0, 1, 1,
+                     0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 27, 0, 0, 0, 0, 0, 0, 0, 0];
+  var arrBuff = new ArrayBuffer(originalMsg.length);
+  var typedArr = new Uint8Array(arrBuff);
+  originalMsg.forEach(function (val, idx) {
+    typedArr[idx] = val;
+  });
+
+  var outputMsg = wsmh.parseWebSocketMessage({data: arrBuff}, {
+    R0: {
+      params: {
+      }
+    }
+  });
+
+  it('should unpack the version from 2 bytes', function () {
+    expect(outputMsg.version).to.equal(512);
+  });
+
+  it('should unpack the channel name correctly', function () {
+    expect(outputMsg.channel).to.equal('R0');
+  });
+
+  it('should unpack the max delay value correctly', function () {
+    expect(outputMsg.maxDelayMs).to.equal(257);
+  });
+
+  it('should unpack the payload values correctly', function () {
+    expect(outputMsg.data.length).to.equal(1);
+  });
+});
+
+describe('it should properly unpack null datapoints', function () {
+  var originalMsg = [2, 0, 5, 0, 82, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 1, 84, 186, 1, 162, 176, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 27, 0, 0, 0, 0, 0, 0, 0, 0];
+  var arrBuff = new ArrayBuffer(originalMsg.length);
+  var typedArr = new Uint8Array(arrBuff);
+  originalMsg.forEach(function (val, idx) {
+    typedArr[idx] = val;
+  });
+
+  var outputMsg = wsmh.parseWebSocketMessage({data: arrBuff}, {
+    R0: {
+      params: {
+      }
+    }
+  });
+
+  it('should unpack the version from 2 bytes', function () {
+    expect(outputMsg.version).to.equal(512);
+  });
+
+  it('should unpack the channel name correctly', function () {
+    expect(outputMsg.channel).to.equal('R0');
+  });
+
+  it('should unpack the null tsid correctly', function () {
+    expect(outputMsg.data[0].tsId).to.equal('AAAAAAAAABs');
+  });
+
+  it('should unpack the null value correctly', function () {
+    expect(outputMsg.data[0].value).to.equal(null);
+  });
+});
+
+describe('it should properly unpack positive binary integer messages with small values (int type)', function () {
+  var originalMsg = [2, 0, 5, 0, 82, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 1, 84, 186, 1, 162, 176, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 1, 3, 0, 0, 0, 0, 220, 123, 36, 27, 0, 0, 0, 0, 0, 0, 0, 42];
+  var arrBuff = new ArrayBuffer(originalMsg.length);
+  var typedArr = new Uint8Array(arrBuff);
+  originalMsg.forEach(function (val, idx) {
+    typedArr[idx] = val;
+  });
+
+  var outputMsg = wsmh.parseWebSocketMessage({data: arrBuff}, {
+    R0: {
+      params: {
+      }
+    }
+  });
+
+  it('should unpack the version from 2 bytes', function () {
+    expect(outputMsg.version).to.equal(512);
+  });
+
+  it('should unpack the channel name correctly', function () {
+    expect(outputMsg.channel).to.equal('R0');
+  });
+
+  it('should unpack integers correctly', function () {
+    expect(outputMsg.data[0].value.toString()).to.equal('42');
+  });
+});
