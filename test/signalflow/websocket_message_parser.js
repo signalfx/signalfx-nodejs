@@ -51,12 +51,24 @@ describe('it should properly unpack binary float messages', function () {
     }
   });
 
+  it('should unpack 1-byte version correctly', function () {
+    expect(outputMsg.version).to.equal(1);
+  });
+
   it('should unpack floats correctly and return a regular number when bigNumber is not set', function () {
     expect(outputMsg.data[0].value).to.equal(9.831329591208355);
   });
 
+  it('should unpack the channel name correctly', function () {
+    expect(outputMsg.channel).to.equal('R0');
+  });
+
   it('should detect binary message types correctly', function () {
-    expect(outputMsg.type === 'data').to.equal(true);
+    expect(outputMsg.type).to.equal('data');
+  });
+
+  it('version 1 message should not have a max delay', function () {
+    expect(typeof outputMsg.maxDelayMs === 'undefined').to.equal(true);
   });
 
   it('should return the correct timestamp', function () {
@@ -66,10 +78,10 @@ describe('it should properly unpack binary float messages', function () {
 
 describe('it should properly unpack negative binary integer messages', function () {
   // this represents a 64 bit long response of -9620000000000001 which will be rounded off in javascript because javascript
-  var negativeLong = [1, 5, 0, 0, 82, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 84, 185, 237, 208, 120, 0, 0, 0, 1, 1, 0, 0, 0, 0, 220, 123, 36, 27, 255, 221, 210, 169, 53, 66, 191, 255];
-  //11111111 11011101 11010010 10101001 00110101 01000010 10111111 11111111
-  //11111111 11011101 11010010 10101001 00110101 01000010 10111111 11111111
-  var arrBuff = new ArrayBuffer(49);
+  var negativeLong = [2, 0, 5, 0, 82, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                      0, 0, 1, 84, 185, 237, 208, 120, 0, 0, 0, 0, 0, 0, 0, 0,
+                      0, 0, 0, 1, 1, 0, 0, 0, 0, 220, 123, 36, 27, 255, 221, 210, 169, 53, 66, 191, 255];
+  var arrBuff = new ArrayBuffer(negativeLong.length);
   var typedArr = new Uint8Array(arrBuff);
   negativeLong.forEach(function (val, idx) {
     typedArr[idx] = val;
@@ -83,6 +95,18 @@ describe('it should properly unpack negative binary integer messages', function 
     }
   });
 
+  it('should unpack the version from 2 bytes', function () {
+    expect(bigNumberOutputMsg.version).to.equal(512);
+  });
+
+  it('should unpack the channel name correctly', function () {
+    expect(bigNumberOutputMsg.channel).to.equal('R0');
+  });
+
+  it('should unpack the max delay correctly', function () {
+    expect(bigNumberOutputMsg.maxDelayMs).to.equal(0);
+  });
+
   it('should unpack negative integers correctly, not losing precision in big number mode', function () {
     expect(bigNumberOutputMsg.data[0].value.toString()).to.equal('-9620000000000001');
   });
@@ -90,9 +114,10 @@ describe('it should properly unpack negative binary integer messages', function 
 
 describe('it should properly unpack positive binary integer messages', function () {
   // this represents a 64 bit long response of -9620000000000001 which will be rounded off in javascript because javascript
-
-  var positiveLong = [1, 5, 0, 0, 82, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 84, 186, 1, 162, 176, 0, 0, 0, 1, 1, 0, 0, 0, 0, 220, 123, 36, 27, 13, 89, 181, 231, 49, 237, 0, 1];
-  var arrBuff = new ArrayBuffer(49);
+  var positiveLong = [2, 0, 5, 0, 82, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                      0, 0, 1, 84, 186, 1, 162, 176, 0, 0, 0, 0, 0, 0, 0, 0,
+                      0, 0, 0, 1, 1, 0, 0, 0, 0, 220, 123, 36, 27, 13, 89, 181, 231, 49, 237, 0, 1];
+  var arrBuff = new ArrayBuffer(positiveLong.length);
   var typedArr = new Uint8Array(arrBuff);
   positiveLong.forEach(function (val, idx) {
     typedArr[idx] = val;
@@ -104,6 +129,18 @@ describe('it should properly unpack positive binary integer messages', function 
         bigNumber: true
       }
     }
+  });
+
+  it('should unpack the version from 2 bytes', function () {
+    expect(bigNumberOutputMsg.version).to.equal(512);
+  });
+
+  it('should unpack the channel name correctly', function () {
+    expect(bigNumberOutputMsg.channel).to.equal('R0');
+  });
+
+  it('should unpack the max delay correctly', function () {
+    expect(bigNumberOutputMsg.maxDelayMs).to.equal(0);
   });
 
   it('should unpack negative integers correctly, not losing precision in big number mode', function () {
