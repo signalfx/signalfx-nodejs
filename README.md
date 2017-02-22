@@ -33,9 +33,9 @@ There are two ways to create an ingest client object:
 var signalfx = require('signalfx');
 
 // Create default client
-var client = new signalfx.Ingest('MY_SIGNALFX_TOKEN' [, options]);
+var client = new signalfx.Ingest('MY_SIGNALFX_TOKEN', {options});
 // or create JSON client
-var clientJson = new signalfx.IngestJson('MY_SIGNALFX_TOKEN' [, options]);
+var clientJson = new signalfx.IngestJson('MY_SIGNALFX_TOKEN', {options});
 ```
 Object `options` is an optional map and may contains following fields:
 + **enableAmazonUniqueId** - boolean, `false` by default. If `true`, library will retrieve Amazon unique identifier and set it as `AWSUniqueId` dimension for each datapoint and event. Use this option only if your application deployed to Amazon  
@@ -44,6 +44,7 @@ Object `options` is an optional map and may contains following fields:
 + **timeout** - number, sending datapoints timeout in ms (default is 1000ms)
 + **batchSize** - number, batch size to group sending datapoints 
 + **userAgents** - array of strings, items from this array will be added to 'user-agent' header separated by comma
++ **proxy** - string, defines an address and credentials for sending metrics through a proxy server. The string should have the following format `http://<USER>:<PASSWORD>@<HOST>:<PORT>`
 
 ### Reporting data
 
