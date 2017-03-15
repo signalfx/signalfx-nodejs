@@ -34,10 +34,12 @@
   "dependencies": {
     "base64-js": "^1.1.2",
     "bignumber.js": "^2.3.0",
+    "pako": "^1.0.4",
     "promise": "^7.0.4",
     "protobufjs": "^4.0.0",
     "request": "^2.61.0",
     "sse.js": "^0.4.1",
+    "text-encoding": "^0.6.4",
     "winston": "^1.0.1",
     "ws": "^1.1.0"
   },
