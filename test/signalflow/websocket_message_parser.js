@@ -245,3 +245,84 @@ describe('it should properly unpack positive binary integer messages with small 
     expect(outputMsg.data[0].value.toString()).to.equal('42');
   });
 });
+
+describe('it should properly unpack binary compressed json messages', function () {
+  var originalMsg = [1, 1, 3, 0, 82, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     120, 156, 171, 86, 42, 169, 44, 72, 85, 82, 176, 82, 80, 74, 206, 207, 43, 41, 202, 207, 209, 205, 77, 45, 46, 78,
+                     76, 79, 85, 210, 81, 80, 74, 45, 75, 205, 43, 81, 2, 202, 121, 249, 59, 197, 7, 135, 56, 6, 133, 128, 68, 51, 18,
+                     243, 82, 114, 82, 65, 194, 142, 48, 224, 156, 175, 84, 11, 0, 128, 222, 22, 125];
+  var arrBuff = new ArrayBuffer(originalMsg.length);
+  var typedArr = new Uint8Array(arrBuff);
+  originalMsg.forEach(function (val, idx) {
+    typedArr[idx] = val;
+  });
+
+  var outputMsg = wsmh.parseWebSocketMessage({data: arrBuff}, {
+    R0: {
+      params: {
+      }
+    }
+  });
+
+  it('should unpack the 1-byte version correctly', function () {
+    expect(outputMsg.version).to.equal(1);
+  });
+
+  it('should unpack the 1-byte message type correctly', function () {
+    expect(outputMsg.type).to.equal('control-message');
+  });
+
+  it('should unpack the 1-byte flags correctly', function () {
+    expect(outputMsg.flags).to.equal(3);
+  });
+
+  it('should unpack the channel name correctly', function () {
+    expect(outputMsg.channel).to.equal('R0');
+  });
+
+  it('should unpack the json message body correctly', function () {
+    expect(outputMsg.event).to.equal('JOB_START');
+    expect(outputMsg.handle).to.equal('AAAAAAAAACo');
+  });
+});
+
+describe('it should properly unpack binary compressed data messages', function () {
+  var originalMsg = [2, 0, 5, 1, 82, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     120, 156, 99, 96, 96, 96, 98, 102, 128, 0, 45, 8, 197, 114, 137, 9,
+                     42, 160, 237, 192, 41, 183, 35, 240, 117, 171, 60, 0, 33, 132, 4, 50];
+  var arrBuff = new ArrayBuffer(originalMsg.length);
+  var typedArr = new Uint8Array(arrBuff);
+  originalMsg.forEach(function (val, idx) {
+    typedArr[idx] = val;
+  });
+
+  var outputMsg = wsmh.parseWebSocketMessage({data: arrBuff}, {
+    R0: {
+      params: {
+      }
+    }
+  });
+
+  it('should unpack the 2-byte version correctly', function () {
+    expect(outputMsg.version).to.equal(512);
+  });
+
+  it('should unpack the 1-byte message type correctly', function () {
+    expect(outputMsg.type).to.equal('data');
+  });
+
+  it('should unpack the 1-byte flags correctly', function () {
+    expect(outputMsg.flags).to.equal(1);
+  });
+
+  it('should detect the correct number of datapoints in binary data batch', function () {
+    expect(outputMsg.count).to.equal(2);
+  });
+
+  it('should decode the datapoints correctly from the binary data batch', function () {
+    expect(outputMsg.data[0].tsId).to.equal('AAAAAAAAACo');
+    expect(outputMsg.data[0].value).to.equal(1234);
+    expect(outputMsg.data[1].tsId).to.equal('AAAAAAAAACs');
+    expect(outputMsg.data[1].value).to.equal(3.14);
+  });
+});
