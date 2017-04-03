@@ -1,6 +1,6 @@
 {
   "name": "signalfx",
-  "version": "4.0.23",
+  "version": "4.0.24",
   "description": "Node.js client library for SignalFx",
   "homepage": "https://signalfx.com",
   "repository": "https://github.com/signalfx/signalfx-nodejs",
