@@ -42,7 +42,8 @@ Object `options` is an optional map and may contains following fields:
 + **dimensions** - object, pre-defined dimensions for each datapoint and event. This object has key-value format `{ dimension_name: dimension_value, ...}`
 + **ingestEndpoint** -  string, custom url to send datapoints in format http://custom.domain/api/path
 + **timeout** - number, sending datapoints timeout in ms (default is 1000ms)
-+ **batchSize** - number, batch size to group sending datapoints 
++ **batchSize** - number, batch size to group sending datapoints (default is 300)
++ **minBatchSize** - number, fewest datapoints that will be sent at a time, however all queued datapoints can be sent by calling `client.flush()` (default is 0)
 + **userAgents** - array of strings, items from this array will be added to 'user-agent' header separated by comma
 + **proxy** - string, defines an address and credentials for sending metrics through a proxy server. The string should have the following format `http://<USER>:<PASSWORD>@<HOST>:<PORT>`
 
