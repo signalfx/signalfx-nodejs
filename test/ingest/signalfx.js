@@ -249,6 +249,36 @@ describe('SignalFx client library (Protobuf mode)', function () {
       });
   });
 
+  it('Will send a batch that only if it is >= the minimum batch size, but can then be flushed', function () {
+    requestStub.yields(null, {statusCode: 200}, 'OK');
+
+    var token = 'my token';
+    var client = new signalFx.Ingest(token, { batchSize: 2, minBatchSize: 2 });
+
+    var gauges = [{
+      metric: 'test.cpu',
+      value: 10
+    }, {
+      metric: 'test.cpu',
+      value: 11
+    }, {
+      metric: 'test.cpu',
+      value: 12
+    }];
+
+    this.timeout(2020);
+    return client.send({gauges: gauges})
+      .then(function () {
+        requestStub.calledOnce.should.be.equal(true);
+        client.queue.length.should.be.equal(1);
+        return client.flush();
+      })
+      .then(function () {
+        requestStub.calledTwice.should.be.equal(true);
+        client.queue.length.should.be.equal(0);
+      });
+  });
+
   it('Send event', function (done) {
     requestStub.yields(null, {statusCode: 200}, 'OK');
 
