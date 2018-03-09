@@ -1,5 +1,7 @@
 'use strict';
 // Copyright (C) 2015 SignalFx, Inc. All rights reserved.
+// Copyright 2017 Nike, Inc.  Nike, Inc. contributions to this file
+// are licensed for use under the Apache-2.0 license.
 
 var sinon = require('sinon');
 var mockery = require('mockery');
