@@ -105,6 +105,10 @@ describe('SignalFx client library (Protobuf mode)', function () {
     signalFx = require('../../lib/signalfx');
   });
 
+  beforeEach(function () {
+    requestStub.reset();
+  });
+
   after(function () {
     mockery.disable();
     mockery.deregisterAll();
@@ -224,6 +228,26 @@ describe('SignalFx client library (Protobuf mode)', function () {
 
   });
 
+  it('promise all datapoints being sent, even if they are batched', function () {
+    requestStub.yields(null, {statusCode: 200}, 'OK');
+
+    var token = 'my token';
+    var client = new signalFx.Ingest(token, { batchSize: 1 });
+
+    var gauges = [{
+      metric: 'test.cpu',
+      value: 10
+    }, {
+      metric: 'test.cpu',
+      value: 11
+    }];
+
+    this.timeout(2020);
+    return client.send({gauges: gauges})
+      .then(function () {
+        requestStub.calledTwice.should.be.equal(true);
+      });
+  });
 
   it('Send event', function (done) {
     requestStub.yields(null, {statusCode: 200}, 'OK');
