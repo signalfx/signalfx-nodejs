@@ -1,6 +1,6 @@
 {
   "name": "signalfx",
-  "version": "5.0.1",
+  "version": "6.0.0",
   "description": "Node.js client library for SignalFx",
   "homepage": "https://signalfx.com",
   "repository": "https://github.com/signalfx/signalfx-nodejs",
@@ -46,6 +46,9 @@
   "scripts": {
     "prepublish": "gulp prepublish",
     "test": "gulp"
+  },
+  "engines": {
+    "npm" : ">=4.0.0"
   },
   "license": "Apache Software License v2"
 }
