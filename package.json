@@ -36,7 +36,7 @@
     "bignumber.js": "^2.3.0",
     "pako": "^1.0.4",
     "promise": "^7.0.4",
-    "protobufjs": "^4.0.0",
+    "protobufjs": "^6.0.0",
     "request": "^2.61.0",
     "sse.js": "^0.4.1",
     "text-encoding": "^0.6.4",
@@ -45,10 +45,11 @@
   },
   "scripts": {
     "prepublish": "gulp prepublish",
-    "test": "gulp"
+    "test": "gulp",
+    "genprotobuf": "pbjs -t static-module -w commonjs proto/signal_fx_protocol_buffers.proto > lib/proto/signal_fx_protocol_buffers_pb2.js"
   },
   "engines": {
-    "npm" : ">=4.0.0"
+    "npm": ">=4.0.0"
   },
   "license": "Apache Software License v2"
 }
