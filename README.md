@@ -33,18 +33,25 @@ There are two ways to create an ingest client object:
 var signalfx = require('signalfx');
 
 // Create default client
-var client = new signalfx.Ingest('MY_SIGNALFX_TOKEN', {options});
+var client = new signalfx.Ingest('ORG_ACCESS_TOKEN', {options});
 // or create JSON client
-var clientJson = new signalfx.IngestJson('MY_SIGNALFX_TOKEN', {options});
+var clientJson = new signalfx.IngestJson('ORG_ACCESS_TOKEN', {options});
 ```
 Object `options` is an optional map and may contains following fields:
 + **enableAmazonUniqueId** - boolean, `false` by default. If `true`, library will retrieve Amazon unique identifier and set it as `AWSUniqueId` dimension for each datapoint and event. Use this option only if your application deployed to Amazon  
 + **dimensions** - object, pre-defined dimensions for each datapoint and event. This object has key-value format `{ dimension_name: dimension_value, ...}`
-+ **ingestEndpoint** -  string, custom url to send datapoints in format http://custom.domain/api/path
++ **ingestEndpoint** -  string, custom url to send datapoints in format http://custom.domain/api/path.
 + **timeout** - number, sending datapoints timeout in ms (default is 5000ms)
 + **batchSize** - number, batch size to group sending datapoints 
 + **userAgents** - array of strings, items from this array will be added to 'user-agent' header separated by comma
 + **proxy** - string, defines an address and credentials for sending metrics through a proxy server. The string should have the following format `http://<USER>:<PASSWORD>@<HOST>:<PORT>`
+
+**A note on ingestEndpoint**
+By default the ingest url is set to `https://ingest.us0.signalfx.com`.
+If you are **not** in this realm, you will need to manually set
+the ingest URL in the format `https://ingest.YOUR_REALM.signalfx.com`.
+To determine if you are in a different realm and need to explicity set `ingestOption`,
+check your profile page in the SignalFx web application.
 
 ### Reporting data
 
@@ -53,7 +60,7 @@ This example shows how to report metrics to SignalFx, as gauges, counters, or cu
 ```js
 var signalfx = require('signalfx');
 
-var client = new signalfx.Ingest('MY_SIGNALFX_TOKEN');
+var client = new signalfx.Ingest('ORG_ACCESS_TOKEN');
 
 client.send({
            cumulative_counters:[
@@ -84,7 +91,7 @@ Reporting dimensions for the data is also optional, and can be accomplished by s
 ```js
 var signalfx = require('signalfx');
 
-var client = new signalfx.Ingest('MY_SIGNALFX_TOKEN');
+var client = new signalfx.Ingest('ORG_ACCESS_TOKEN');
 
 client.send({
           cumulative_counters:[
@@ -126,7 +133,7 @@ option from dictionary `client.EVENT_CATEGORIES`.
 ```js
 var signalfx = require('signalfx');
 
-var client = new signalfx.Ingest('MY_SIGNALFX_TOKEN');
+var client = new signalfx.Ingest('ORG_ACCESS_TOKEN');
 
 client.sendEvent({
           category: '[event_category]',
@@ -147,7 +154,7 @@ Complete code example for Reporting data
 ```js
 var signalfx = require('signalfx');
 
-var myToken = 'MY_SIGNALFX_TOKEN';
+var myToken = 'ORG_ACCESS_TOKEN';
 
 var client = new signalfx.Ingest(myToken);
 var gauges = [{
@@ -167,7 +174,7 @@ Complete code example for Sending events
 ```js
 var signalfx = require('signalfx');
 
-var myToken = '[MY_SIGNALFX_TOKEN]';
+var myToken = '[ORG_ACCESS_TOKEN]';
 
 var client = new signalfx.Ingest(myToken);
 
@@ -199,6 +206,10 @@ $ node path/to/example/generic_usage.js
 
 To use the SignalFlow library, you need a SignalFx user access token, which can be
 obtained from the SignalFx via the REST API(https://developers.signalfx.com/docs/session)
+Note, if you are not in the `us0` realm you will need to manually set the stream URL.
+To determine if you are in a different realm, check your profile page in the
+SignalFx web application.
+
 
 ### SignalFlow 
 
@@ -208,9 +219,10 @@ Complete code example for executing a computation
 ```js
 var signalfx = require('signalfx');
 
-var myToken = '[MY_SIGNALFX_TOKEN]';
+var myToken = '[USER_API_ACCESS_TOKEN]';
+var options = {'signalflowEndpoint': 'wss://stream.YOUR_REALM.signalfx.com'};
 
-var client = new signalfx.SignalFlow(myToken);
+var client = new signalfx.SignalFlow(myToken, options);
 
 var handle = client.execute({
             program: "data('cpu.utilization').mean().publish()",
@@ -316,7 +328,7 @@ First ensure your current working directory is the root of the nodejs repository
 
 Make the following changes to example/index.html
 ```
-replace 'YOUR USER TOKEN' with your own token.
+replace 'ORG_ACCESS_TOKEN' with your own token.
 replace 'cpu.utilization' with an appropriate metric as necessary.
 ```
 
