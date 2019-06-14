@@ -219,14 +219,30 @@ For more information on access tokens, see the API's [Authentication Documentati
 
 ### SignalFlow 
 
+#### Configuring the Signalflow websocket endpoint
+
+If the websocket endpoint is not set manually, this library uses the ``us0`` realm by default.
+If you are not in this realm, you will need to explicitly set the
+endpoint urls above. To determine if you are in a different realm and need to
+explicitly set the endpoints, check your profile page in the SignalFx
+web application.
+
+
 #### Examples 
 
 Complete code example for executing a computation
 ```js
 var signalfx = require('signalfx');
 
+var wsCallback = function(evt) {
+    console.log('Hello, I'm a custom callback: ' + evt);
+}
+
 var myToken = '[ACCESS_TOKEN]';
-var options = {'signalflowEndpoint': 'wss://stream.{REALM}.signalfx.com'};
+var options = {'signalflowEndpoint': 'wss://stream.{REALM}.signalfx.com',
+               'apiEndpoint': 'https://api.{REALM}.signalfx.com',
+               'webSocketErrorCallback': wsCallback
+              };
 
 var client = new signalfx.SignalFlow(myToken, options);
 
@@ -240,7 +256,13 @@ var handle = client.execute({
 handle.stream(function(err, data) { console.log(data); });
 ```
 
-Please note that a token created via the REST API is necessary to use this API.  API Access tokens intended for ingest are not allowed.
+Object `options` is an optional map and may contains following fields:
++ **signalflowEndpoint** - string, `wss://stream.us0.signalfx.com` by default. Override this if you are in a different realm than `us0`.
++ **apiEndpoint** - string, `https://api.us0.signalfx.com` by default. Override this if you are in a different realm than `us0`.
++ **webSockerErrorCallback** - function, Throws an Error event by default. Override this if you want to handle a websocket error differently.
+
+**Note**: A token created via the REST API is necessary to use this API.  API Access tokens intended for ingest are not allowed.
+
 
 #### API Options
 
