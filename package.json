@@ -1,6 +1,6 @@
 {
   "name": "signalfx",
-  "version": "6.0.1",
+  "version": "7.0.0",
   "description": "Node.js client library for SignalFx",
   "homepage": "https://signalfx.com",
   "repository": "https://github.com/signalfx/signalfx-nodejs",
@@ -49,7 +49,7 @@
     "genprotobuf": "pbjs -t static-module -w commonjs proto/signal_fx_protocol_buffers.proto > lib/proto/signal_fx_protocol_buffers_pb2.js"
   },
   "engines": {
-    "npm": ">=4.0.0"
+    "npm": ">=8.0.0"
   },
   "license": "Apache-2.0"
 }
