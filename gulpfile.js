@@ -9,28 +9,28 @@ var plumber = require('gulp-plumber');
 var browserify = require('browserify');
 var source = require('vinyl-source-stream');
 
-gulp.task('static', function () {
+gulp.task('static', gulp.series(function () {
   return gulp.src(['**/*.js', '!**/*protocol_buffers*.js'])
     .pipe(excludeGitignore())
     .pipe(eslint())
     .pipe(eslint.format())
     .pipe(eslint.failAfterError());
-});
+}));
 
-gulp.task('nsp', function (cb) {
-  nsp('package.json', cb);
-});
+gulp.task('nsp', gulp.series(function (cb) {
+  return nsp('package.json', cb);
+}));
 
-gulp.task('pre-test', function () {
+gulp.task('pre-test', gulp.series(function () {
   return gulp.src('lib/**/*.js')
     .pipe(istanbul({includeUntested: true}))
     .pipe(istanbul.hookRequire());
-});
+}));
 
-gulp.task('test', ['pre-test'], function (cb) {
+gulp.task('test', gulp.series('pre-test', function (cb) {
   var mochaErr;
 
-  gulp.src('test/**/*.js')
+  return gulp.src('test/**/*.js')
     .pipe(plumber())
     .pipe(mocha({reporter: 'spec'})) // nyan
     .on('error', function (err) {
@@ -40,9 +40,9 @@ gulp.task('test', ['pre-test'], function (cb) {
     .on('end', function () {
       cb(mochaErr);
     });
-});
+}));
 
-gulp.task('browserify', function () {
+gulp.task('browserify', gulp.series(function () {
   //todo : minify
   return browserify('./lib/signalfx_browser.js', { standalone: 'signalfx.streamer' })
     .exclude('bufferutil')
@@ -52,7 +52,11 @@ gulp.task('browserify', function () {
     .bundle()
     .pipe(source('signalfx.js'))
     .pipe(gulp.dest('./build/'));
-});
+}));
 
-gulp.task('prepublish');
-gulp.task('default', ['static', 'test']);
+gulp.task('prepublish', gulp.series(function (done) {
+  done();
+}));
+gulp.task('default', gulp.series('static', 'test', function (done) {
+  done();
+}));
