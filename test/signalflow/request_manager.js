@@ -7,7 +7,7 @@ var expect = require('chai').expect;
 describe('The SignalFlow Request Manager', function () {
   //TODO : re-enable this test once we figure out why it causes a hang
   var client = sflowclient('AUTHTOKEN');
-  it('should initialize a request manager with four methods, execute, stop, authenticate, registerLiveTail and stopLiveTail', function (done) {
+  it('should initialize a request manager with six methods, execute, stop, authenticate, disconnect, registerLiveTail and stopLiveTail', function (done) {
     var exposedFns = Object.keys(client);
     expect(exposedFns.length).to.equal(6);
     expect(exposedFns.indexOf('execute')).to.not.be.equal(-1);
