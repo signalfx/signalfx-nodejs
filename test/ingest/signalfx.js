@@ -89,6 +89,7 @@ describe('Integration test (Protobuf mode)', function () {
 describe('SignalFx client library (Protobuf mode)', function () {
 
   var requestStub;
+  var tracingStub;
 
   before(function () {
     mockery.enable({
@@ -101,6 +102,12 @@ describe('SignalFx client library (Protobuf mode)', function () {
 
     // replace the module `request` with a stub object
     mockery.registerMock('request', requestStub);
+
+    tracingStub = sinon.stub();
+    mockery.registerMock('../../tracing', { withNonReportingScope: function (callback) {
+      tracingStub(callback);
+      callback();
+    }});
 
     signalFx = require('../../lib/signalfx');
   });
@@ -155,6 +162,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
       enableAmazonUniqueId: enableAmazonUniqueId
     });
 
+    tracingStub.called.should.be.equal(true);
     client.apiToken.should.be.equal(token);
     client.AWSUniqueId.should.be.equal('instance_region_account');
     client.enableAmazonUniqueId.should.be.equal(true);
@@ -175,6 +183,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
       enableAmazonUniqueId: enableAmazonUniqueId
     });
 
+    tracingStub.called.should.be.equal(true);
     client.apiToken.should.be.equal(token);
     client.enableAmazonUniqueId.should.be.equal(false);
     client.AWSUniqueId.should.be.equal('');
@@ -218,6 +227,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
 
     this.timeout(2020);
     setTimeout(function () {
+      tracingStub.called.should.be.equal(true);
       requestStub.called.should.be.equal(true);
       done();
     }, 2000);
@@ -246,6 +256,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
 
     this.timeout(1020);
     setTimeout(function () {
+      tracingStub.called.should.be.equal(true);
       requestStub.called.should.be.equal(true);
       done();
     }, 1000);
@@ -268,6 +279,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
 
     this.timeout(1020);
     setTimeout(function () {
+      tracingStub.called.should.be.equal(true);
       requestStub.called.should.be.equal(true);
       done();
     }, 1000);
@@ -290,6 +302,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
 
     this.timeout(1020);
     setTimeout(function () {
+      tracingStub.called.should.be.equal(true);
       requestStub.called.should.be.equal(true);
       done();
     }, 1000);
@@ -602,6 +615,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
 describe('SignalFx client library (Json mode)', function () {
 
   var requestStub;
+  var tracingStub;
 
   before(function () {
     mockery.enable({
@@ -614,6 +628,12 @@ describe('SignalFx client library (Json mode)', function () {
 
     // replace the module `request` with a stub object
     mockery.registerMock('request', requestStub);
+
+    tracingStub = sinon.stub();
+    mockery.registerMock('../../tracing', { withNonReportingScope: function (callback) {
+      tracingStub(callback);
+      callback();
+    }});
 
     signalFx = require('../../lib/signalfx');
   });
@@ -709,6 +729,7 @@ describe('SignalFx client library (Json mode)', function () {
 
     this.timeout(1020);
     setTimeout(function () {
+      tracingStub.called.should.be.equal(true);
       requestStub.called.should.be.equal(true);
       done();
     }, 1000);
@@ -904,6 +925,7 @@ describe('SignalFx client library (Json mode)', function () {
 
     this.timeout(1020);
     setTimeout(function () {
+      tracingStub.called.should.be.equal(true);
       requestStub.called.should.be.equal(true);
       done();
     }, 1000);
