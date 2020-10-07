@@ -49,7 +49,7 @@
     "genprotobuf": "pbjs -t static-module -w commonjs proto/signal_fx_protocol_buffers.proto > lib/proto/signal_fx_protocol_buffers_pb2.js"
   },
   "engines": {
-    "npm": ">=8.0.0"
+    "node": ">=8.0.0"
   },
   "license": "Apache-2.0"
 }
