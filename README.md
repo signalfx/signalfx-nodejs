@@ -195,13 +195,16 @@ client.sendEvent({category: eventCategory,
             dimensions: dimensions, 
             properties:properties});
 ```
-See `example/generic_usage.js` for a complete code example for Reporting data.
+See `example/general_usage.js` for a complete code example for Reporting data.
 Set your SignalFx token and run example 
 
 ```sh
-$ node path/to/example/generic_usage.js
+$ node path/to/example/general_usage.js
 ```
 
+### Log level
+The default log level is `info`.
+You can override it by setting `SFX_CLIENT_LOG_LEVEL` environment variable. Valid values are winston log levels: `error`, `warn`, `info`, `http`, `verbose`, `debug` and `silly`.
 
 ## SignalFlow API
 

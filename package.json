@@ -1,6 +1,6 @@
 {
   "name": "signalfx",
-  "version": "7.2.1",
+  "version": "7.2.2",
   "description": "Node.js client library for SignalFx",
   "homepage": "https://signalfx.com",
   "repository": "https://github.com/signalfx/signalfx-nodejs",
@@ -40,7 +40,7 @@
     "request": "^2.61.0",
     "sse.js": "^0.4.1",
     "text-encoding": "^0.6.4",
-    "winston": "^1.0.1",
+    "winston": "^3.3.3",
     "ws": "^7.1.2"
   },
   "scripts": {
