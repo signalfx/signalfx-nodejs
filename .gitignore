@@ -3,4 +3,3 @@ coverage
 build
 .idea
 *.iml
-package-lock.json
