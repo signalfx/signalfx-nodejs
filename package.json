@@ -18,9 +18,9 @@
     "nodejs"
   ],
   "devDependencies": {
-    "browserify": "^13.0.1",
+    "browserify": "^16.5.2",
     "chai": "^3.2.0",
-    "gulp": "^3.6.0",
+    "gulp": "^4.0.2",
     "gulp-eslint": "^0.15.0",
     "gulp-exclude-gitignore": "^1.0.0",
     "gulp-istanbul": "^0.9.0",
@@ -29,7 +29,7 @@
     "gulp-plumber": "^1.0.0",
     "mockery": "^1.4.0",
     "sinon": "^1.16.1",
-    "vinyl-source-stream": "^1.1.0"
+    "vinyl-source-stream": "^2.0.0"
   },
   "dependencies": {
     "base64-js": "^1.1.2",
@@ -43,12 +43,14 @@
     "ws": "^7.1.2"
   },
   "scripts": {
+    "build:browser": "gulp browserify",
+    "genprotobuf": "pbjs -t static-module -w commonjs proto/signal_fx_protocol_buffers.proto > lib/proto/signal_fx_protocol_buffers_pb2.js",
+    "lint": "gulp lint",
     "prepublish": "gulp prepublish",
-    "test": "gulp",
-    "genprotobuf": "pbjs -t static-module -w commonjs proto/signal_fx_protocol_buffers.proto > lib/proto/signal_fx_protocol_buffers_pb2.js"
+    "test": "gulp test"
   },
   "engines": {
-    "node": ">=8.0.0 <11"
+    "node": ">=8.0.0 <15"
   },
   "license": "Apache-2.0"
 }
