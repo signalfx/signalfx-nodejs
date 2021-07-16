@@ -1,4 +1,3 @@
-[![NPM version][npm-image]][npm-url] [![Circle CI](https://circleci.com/gh/signalfx/signalfx-nodejs.svg?style=svg)](https://circleci.com/gh/signalfx/signalfx-nodejs)
 # Node.js client library for SignalFx
 
 This is a programmatic interface in JavaScript for SignalFx's metadata and
@@ -6,14 +5,12 @@ ingest APIs. It is meant to provide a base for communicating with
 SignalFx APIs that can be easily leveraged by scripts and applications
 to interact with SignalFx or report metric and event data to SignalFx.
 
-
 ## Installation
 
 To install using npm:
 ```sh
 $ npm install signalfx
 ```
-
 
 ## Usage
 
@@ -26,9 +23,9 @@ more information on access tokens, see the API's [Authentication documentation](
 
 ### Create client
 
-There are two ways to create an ingest client object: 
+There are two ways to create an ingest client object:
 
-+ The default constructor `Ingest`. This constructor uses Protobuf to send data to SignalFx. If it cannot send Protobuf, it falls back to sending JSON. 
++ The default constructor `Ingest`. This constructor uses Protobuf to send data to SignalFx. If it cannot send Protobuf, it falls back to sending JSON.
 + The JSON constructor `IngestJson`. This constructor uses JSON format to send data to SignalFx.
 
 ```js
@@ -40,11 +37,11 @@ var client = new signalfx.Ingest('ORG_TOKEN', {options});
 var clientJson = new signalfx.IngestJson('ORG_TOKEN', {options});
 ```
 Object `options` is an optional map and may contains following fields:
-+ **enableAmazonUniqueId** - boolean, `false` by default. If `true`, library will retrieve Amazon unique identifier and set it as `AWSUniqueId` dimension for each datapoint and event. Use this option only if your application deployed to Amazon  
++ **enableAmazonUniqueId** - boolean, `false` by default. If `true`, library will retrieve Amazon unique identifier and set it as `AWSUniqueId` dimension for each datapoint and event. Use this option only if your application deployed to Amazon
 + **dimensions** - object, pre-defined dimensions for each datapoint and event. This object has key-value format `{ dimension_name: dimension_value, ...}`
 + **ingestEndpoint** -  string, custom url to send datapoints in format http://custom.domain/api/path
 + **timeout** - number, sending datapoints timeout in ms (default is 5000ms)
-+ **batchSize** - number, batch size to group sending datapoints 
++ **batchSize** - number, batch size to group sending datapoints
 + **userAgents** - array of strings, items from this array will be added to 'user-agent' header separated by comma
 + **proxy** - string, defines an address and credentials for sending metrics through a proxy server. The string should have the following format `http://<USER>:<PASSWORD>@<HOST>:<PORT>`
 
@@ -58,7 +55,7 @@ web application.
 
 ### Reporting data
 
-This example shows how to report metrics to SignalFx, as gauges, counters, or cumulative counters. 
+This example shows how to report metrics to SignalFx, as gauges, counters, or cumulative counters.
 
 ```js
 var signalfx = require('signalfx');
@@ -67,19 +64,19 @@ var client = new signalfx.Ingest('ORG_TOKEN');
 
 client.send({
            cumulative_counters:[
-             {  metric: 'myfunc.calls_cumulative', 
+             {  metric: 'myfunc.calls_cumulative',
                 value: 10,
                 timestamp: 1442960607000},
              ...
            ],
            gauges:[
-             {  metric: 'myfunc.time', 
+             {  metric: 'myfunc.time',
                 value: 532,
                 timestamp: 1442960607000},
              ...
            ],
            counters:[
-             {  metric: 'myfunc.calls', 
+             {  metric: 'myfunc.calls',
                 value: 42,
                 timestamp: 1442960607000},
              ...
@@ -98,20 +95,20 @@ var client = new signalfx.Ingest('ORG_TOKEN');
 
 client.send({
           cumulative_counters:[
-            { 'metric': 'myfunc.calls_cumulative', 
-              'value': 10, 
+            { 'metric': 'myfunc.calls_cumulative',
+              'value': 10,
               'dimensions': {'host': 'server1', 'host_ip': '1.2.3.4'}},
             ...
           ],
           gauges:[
-            { 'metric': 'myfunc.time', 
-              'value': 532, 
+            { 'metric': 'myfunc.time',
+              'value': 532,
               'dimensions': {'host': 'server1', 'host_ip': '1.2.3.4'}},
             ...
           ],
           counters:[
-            { 'metric': 'myfunc.calls', 
-              'value': 42, 
+            { 'metric': 'myfunc.calls',
+              'value': 42,
               'dimensions': {'host': 'server1', 'host_ip': '1.2.3.4'}},
             ...
           ]});
@@ -123,9 +120,9 @@ Events can be send to SignalFx via the `sendEvent` function. The
 event param objects must be specified. `Event` param object is an optional map and may contains following fields:
 
 + **eventType** (string) - Required field. The event type (name of the event time series).
-+ **category** (int) - the category of event. Choose one from EVENT_CATEGORIES list. 
-Different categories of events are supported.Available categories of events are `USER_DEFINED`, `ALERT`, `AUDIT`, `JOB`, 
-`COLLECTD`, `SERVICE_DISCOVERY`, `EXCEPTION`. For mode details see 
++ **category** (int) - the category of event. Choose one from EVENT_CATEGORIES list.
+Different categories of events are supported.Available categories of events are `USER_DEFINED`, `ALERT`, `AUDIT`, `JOB`,
+`COLLECTD`, `SERVICE_DISCOVERY`, `EXCEPTION`. For mode details see
 `proto/signal_fx_protocol_buffers.proto` file. Value by default is `USER_DEFINED`
 + **dimensions**  (dict) - a map of event dimensions, empty dictionary by default
 + **properties**  (dict) - a map of extra properties on that event, empty dictionary by default
@@ -169,7 +166,7 @@ var counters = [{
         metric: 'cpu_cnt',
         value:  2
       }];
-      
+
 client.send({gauges: gauges, counters: counters});
 ```
 
@@ -190,13 +187,13 @@ var dimensions = {
   };
 var properties = {version: '[EVENT-VERSION]'};
 
-client.sendEvent({category: eventCategory, 
-            eventType: eventType, 
-            dimensions: dimensions, 
+client.sendEvent({category: eventCategory,
+            eventType: eventType,
+            dimensions: dimensions,
             properties:properties});
 ```
 See `example/general_usage.js` for a complete code example for Reporting data.
-Set your SignalFx token and run example 
+Set your SignalFx token and run example
 
 ```sh
 $ node path/to/example/general_usage.js
@@ -220,7 +217,7 @@ Developers documentation:
 The SignalFlow cilent accepts either an Organization Access Token or a User API Token.
 For more information on access tokens, see the API's [Authentication Documentation](https://developers.signalfx.com/basics/authentication.html).
 
-### SignalFlow 
+### SignalFlow
 
 #### Configuring the Signalflow websocket endpoint
 
@@ -231,7 +228,7 @@ explicitly set the endpoints, check your profile page in the SignalFx
 web application.
 
 
-#### Examples 
+#### Examples
 
 Complete code example for executing a computation
 ```js
@@ -288,7 +285,7 @@ The returned object from an execute call possesses the following methods:
 + **get_known_tsids** () - gets all known timeseries ID's for the current computation
 + **get_metadata** (string) - gets the metadata message associated with the specific timeseries ID.
 
-#### Stream Message Types 
+#### Stream Message Types
 + Metadata
 ```js
 {
@@ -298,7 +295,7 @@ The returned object from an execute call possesses the following methods:
     sf_key : [<String>]
     sf_metric: <String>
     ...
-  }, 
+  },
   tsId : "<ID>"
 }
 ```
@@ -311,7 +308,7 @@ The returned object from an execute call possesses the following methods:
     {
       tsId : "<ID>",
       value : <Number>
-    }, 
+    },
     ...
   ],
   logicalTimestampMs : <Number>
@@ -345,7 +342,7 @@ $ gulp browserify
 The output can be found at ./build/signalfx.js
 ```
 
-It can then be loaded as usual via a script tag 
+It can then be loaded as usual via a script tag
 
 ```
 <script src="build/signalfx.js" type="text/javascript"></script>
@@ -363,7 +360,7 @@ replace 'ACCESS_TOKEN' with your own token.
 replace 'cpu.utilization' with an appropriate metric as necessary.
 ```
 
-Execute the following commands 
+Execute the following commands
 ```
 $ npm install
 $ gulp browserify
