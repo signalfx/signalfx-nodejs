@@ -54,6 +54,7 @@ exports.browserify = function () {
     .pipe(gulp.dest('./build/'));
 };
 
+exports.lint = lint;
 exports.static = lint;
 exports.prepublish = function prepublish(cb) {
   cb();
