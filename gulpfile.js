@@ -9,25 +9,25 @@ var plumber = require('gulp-plumber');
 var browserify = require('browserify');
 var source = require('vinyl-source-stream');
 
-gulp.task('static', function () {
+function lint() {
   return gulp.src(['**/*.js', '!**/*protocol_buffers*.js'])
     .pipe(excludeGitignore())
     .pipe(eslint())
     .pipe(eslint.format())
     .pipe(eslint.failAfterError());
-});
+}
 
-gulp.task('nsp', function (cb) {
+exports.nsp = function (cb) {
   nsp('package.json', cb);
-});
+};
 
-gulp.task('pre-test', function () {
+function preTest() {
   return gulp.src('lib/**/*.js')
     .pipe(istanbul({includeUntested: true}))
     .pipe(istanbul.hookRequire());
-});
+}
 
-gulp.task('test', ['pre-test'], function (cb) {
+function test(cb) {
   var mochaErr;
 
   gulp.src('test/**/*.js')
@@ -40,9 +40,9 @@ gulp.task('test', ['pre-test'], function (cb) {
     .on('end', function () {
       cb(mochaErr);
     });
-});
+}
 
-gulp.task('browserify', function () {
+exports.browserify = function () {
   //todo : minify
   return browserify('./lib/signalfx_browser.js', { standalone: 'signalfx.streamer' })
     .exclude('bufferutil')
@@ -52,7 +52,11 @@ gulp.task('browserify', function () {
     .bundle()
     .pipe(source('signalfx.js'))
     .pipe(gulp.dest('./build/'));
-});
+};
 
-gulp.task('prepublish');
-gulp.task('default', ['static', 'test']);
+exports.static = lint;
+exports.prepublish = function prepublish(cb) {
+  cb();
+};
+exports.test = gulp.series(preTest, test);
+exports.default = gulp.series(lint, test);
