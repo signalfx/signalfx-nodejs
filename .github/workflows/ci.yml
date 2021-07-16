@@ -25,5 +25,5 @@ jobs:
         run: npm run lint
       - name: Test
         run: npm run test
-      - name: Unit test
-        run: npm run test:unit:ci
+      - name: Attempt browser build
+        run: npm run build:browser
