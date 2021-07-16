@@ -35,7 +35,7 @@ $ npm install signalfx
 To use this library, you need a SignalFx access token. When using the ingest client
 you will need to specify your organization's access token. For the SignalFlow Client,
 either an organization access token or a user API token may be used. For
-more information on access tokens, see the API's [Authentication documentation](https://developers.signalfx.com/basics/authentication.html).
+more information on access tokens, see the API's [Authentication documentation](https://dev.splunk.com/observability/docs/apibasics/authentication_basics/).
 
 ### Create client
 
@@ -231,7 +231,7 @@ Developers documentation:
 ### API access token
 
 The SignalFlow cilent accepts either an Organization Access Token or a User API Token.
-For more information on access tokens, see the API's [Authentication Documentation](https://developers.signalfx.com/basics/authentication.html).
+For more information on access tokens, see the API's [Authentication Documentation](https://dev.splunk.com/observability/docs/apibasics/authentication_basics/).
 
 ### SignalFlow
 
@@ -388,6 +388,3 @@ Finally, open http://localhost:8888/example/index.html
 ## License
 
 Apache Software License v2 © [SignalFx](https://signalfx.com)
-
-[npm-image]: https://badge.fury.io/js/signalfx.svg
-[npm-url]: https://npmjs.org/package/signalfx
