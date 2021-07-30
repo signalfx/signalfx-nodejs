@@ -277,7 +277,7 @@ handle.stream(function(err, data) { console.log(data); });
 Object `options` is an optional map and may contains following fields:
 + **signalflowEndpoint** - string, `wss://stream.us0.signalfx.com` by default. Override this if you are in a different realm than `us0`.
 + **apiEndpoint** - string, `https://api.us0.signalfx.com` by default. Override this if you are in a different realm than `us0`.
-+ **webSockerErrorCallback** - function, Throws an Error event by default. Override this if you want to handle a websocket error differently.
++ **webSocketErrorCallback** - function, Throws an Error event by default. Override this if you want to handle a websocket error differently.
 
 **Note**: A token created via the REST API is necessary to use this API.  API Access tokens intended for ingest are not allowed.
 
