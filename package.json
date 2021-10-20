@@ -50,7 +50,7 @@
     "test": "gulp test"
   },
   "engines": {
-    "node": ">=8.0.0 <15"
+    "node": ">=8.0.0 <18"
   },
   "license": "Apache-2.0"
 }
