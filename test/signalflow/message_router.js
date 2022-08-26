@@ -25,6 +25,14 @@ function getJobMessages() {
       type: 'control-message'
     },
     {
+      type: 'data',
+      channel: 'R0',
+      version: 1,
+      messageType: 5,
+      logicalTimestampMs: 1462845656000,
+      data: []
+    },
+    {
       channel: 'R0',
       tsId: 'AAAAAOQElGM',
       properties: {
@@ -232,11 +240,22 @@ function getJobMessages() {
       messageType: 5,
       logicalTimestampMs: 1462845657000,
       data: [{tsId: 'AAAAAJ5grV4', value: 82.06513496503497}]
+    },
+    {
+      type: 'data',
+      channel: 'R0',
+      version: 1,
+      messageType: 5,
+      logicalTimestampMs: 1462845657000,
+      data: []
     }
   ];
 }
 
 var jobMessages = getJobMessages();
+var params = {
+  program: 'data(\'jvm.cpu.load\').mean().stream(label=\'mean\')\ndata(\'jvm.cpu.load\').max().stream(label=\'max\')'
+};
 
 describe('routed message handler properly determines job state', function () {
 
@@ -265,9 +284,6 @@ describe('routed message handler properly determines job state', function () {
         break;
     }
   }
-  var params = {
-    program: 'data(\'jvm.cpu.load\').mean().stream(label=\'mean\')\ndata(\'jvm.cpu.load\').max().stream(label=\'max\')'
-  };
 
   var inst = rmh(params, onMessage);
   jobMessages.forEach(inst.onMessage);
@@ -280,3 +296,24 @@ describe('routed message handler properly determines job state', function () {
     inst.getLatestBatchTimeStamp().should.be.equal(1462845657000);
   });
 });
+
+describe('routed message handler properly flushes data in its buffer', function () {
+
+  it('should have an empty buffer if publish size is determined by JOB_RUNNING_RESOLUTION message', function () {
+    var inst = rmh(params, function () {});
+    jobMessages.forEach(inst.onMessage);
+
+    inst._getBufferSize().should.be.equal(0);
+  });
+
+  it('should have an empty buffer if publish size is determined by logic timestamp difference', function () {
+    var inst = rmh(params, function () {});
+    jobMessages = jobMessages.filter(function (m) {
+      return !m.message || m.message.messageCode !== 'JOB_RUNNING_RESOLUTION';
+    });
+    jobMessages.forEach(inst.onMessage);
+
+    inst._getBufferSize().should.be.equal(0);
+  });
+});
+
