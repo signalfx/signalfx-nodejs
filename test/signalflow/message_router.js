@@ -297,20 +297,23 @@ describe('routed message handler properly determines job state', function () {
   });
 });
 
-describe('routed message handler properly flushes data in its buffer', function() {
-  
+describe('routed message handler properly flushes data in its buffer', function () {
+
   it('should have an empty buffer if publish size is determined by JOB_RUNNING_RESOLUTION message', function () {
-    var inst = rmh(params, () => {});
+    var inst = rmh(params, function () {});
     jobMessages.forEach(inst.onMessage);
 
     inst._getBufferSize().should.be.equal(0);
   });
 
   it('should have an empty buffer if publish size is determined by logic timestamp difference', function () {
-    var inst = rmh(params, () => {});
-    jobMessages = jobMessages.filter(m => !m.message || m.message.messageCode != 'JOB_RUNNING_RESOLUTION');
+    var inst = rmh(params, function () {});
+    jobMessages = jobMessages.filter(function (m) {
+      return !m.message || m.message.messageCode !== 'JOB_RUNNING_RESOLUTION';
+    });
     jobMessages.forEach(inst.onMessage);
 
     inst._getBufferSize().should.be.equal(0);
   });
-})
+});
+
