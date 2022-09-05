@@ -1,11 +1,18 @@
 'use strict';
 var signalFx = require('../lib/signalfx');
 
-var token = 'YOUR SIGNALFX TOKEN'; // Replace with you token
+var token = process.env['SPLUNK_ACCESS_TOKEN'];
+console.log('token is', token);
+
+var realm = process.env['SPLUNK_REALM'] || 'us0';
+console.log('https://ingest.' + realm + '.signalfx.com');
 
 var client = new signalFx.Ingest(token, {
   enableAmazonUniqueId: false, // Set this parameter to `true` to retrieve and add Amazon unique identifier as dimension
-  dimensions: {type: 'test.cust_dim'} // This dimension will be added to every datapoint and event
+  ingestEndpoint: 'https://ingest.' + realm + '.signalfx.com',
+  dimensions: {
+    type: 'test.cust_dim' // This dimension will be added to every datapoint and event
+  }
 });
 
 // Sent datapoints routine

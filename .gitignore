@@ -1,5 +1,8 @@
 node_modules
 coverage
+
 build
+lib/proto/signal_fx_protocol_buffers_pb2.js
+
 .idea
 *.iml

@@ -229,7 +229,7 @@ See `example/general_usage.js` for a complete code example for Reporting data.
 Set your SignalFx token and run example
 
 ```sh
-$ node path/to/example/general_usage.js
+$ SPLUNK_ACCESS_TOKEN=xxx SPLUNK_REALM=xxx node example/general_usage.js
 ```
 
 ### Log level
