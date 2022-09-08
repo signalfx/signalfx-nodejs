@@ -21,6 +21,7 @@ jobs:
         with:
           node-version: ${{ matrix.nodejs }}
       - run: npm ci
+      - run: npm run genprotobuf
       - name: Lint code
         run: npm run lint
       - name: Test

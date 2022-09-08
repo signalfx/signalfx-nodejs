@@ -2,10 +2,7 @@
 var signalFx = require('../lib/signalfx');
 
 var token = process.env['SPLUNK_ACCESS_TOKEN'];
-console.log('token is', token);
-
 var realm = process.env['SPLUNK_REALM'] || 'us0';
-console.log('https://ingest.' + realm + '.signalfx.com');
 
 var client = new signalFx.Ingest(token, {
   enableAmazonUniqueId: false, // Set this parameter to `true` to retrieve and add Amazon unique identifier as dimension
