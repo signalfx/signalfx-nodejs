@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "base64-js": "^1.5.1",
-    "bignumber.js": "^2.3.0",
+    "bignumber.js": "^9.1.0",
     "pako": "^2.0.4",
     "promise": "^7.0.4",
     "protobufjs": "^6.0.0",
