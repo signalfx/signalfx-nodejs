@@ -1,6 +1,6 @@
 {
   "name": "signalfx",
-  "version": "7.5.0",
+  "version": "8.0.0.beta.1",
   "description": "Node.js client library for SignalFx",
   "homepage": "https://signalfx.com",
   "repository": "https://github.com/signalfx/signalfx-nodejs",
@@ -28,6 +28,7 @@
     "gulp-mocha": "^8.0.0",
     "gulp-nsp": "^3.0.1",
     "gulp-plumber": "^1.0.0",
+    "mocha": "^8.4.0",
     "mockery": "^2.1.0",
     "sinon": "^14.0.0",
     "vinyl-source-stream": "^2.0.0"
@@ -46,8 +47,7 @@
     "build:browser": "gulp browserify",
     "genprotobuf": "pbjs -t static-module -w commonjs proto/signal_fx_protocol_buffers.proto > ./proto/signal_fx_protocol_buffers_pb2.js",
     "lint": "eslint lib/**",
-    "prepublish": "gulp prepublish",
-    "test": "gulp test"
+    "test": "mocha --recursive './test/**'"
   },
   "engines": {
     "node": ">=11.0.0 <19"
