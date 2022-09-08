@@ -21,7 +21,7 @@
   "devDependencies": {
     "browserify": "^16.5.2",
     "chai": "^4.3.6",
-    "eslint": "^8.23.0",
+    "eslint": "7.32",
     "mocha": "^8.4.0",
     "mockery": "^2.1.0",
     "sinon": "^14.0.0",
