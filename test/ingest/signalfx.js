@@ -597,7 +597,6 @@ describe('SignalFx client library (Protobuf mode)', function () {
 
     builtEvent.properties[1].key.should.not.be.empty;
     builtEvent.properties[1].key.should.be.equal('intVersion');
-    builtEvent.properties[1].value.intValue.should.not.be.empty;
     builtEvent.properties[1].value.intValue.should.be.equal(5);
 
     done();
