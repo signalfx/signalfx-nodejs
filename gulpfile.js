@@ -1,6 +1,5 @@
 'use strict';
 var gulp = require('gulp');
-var eslint = require('gulp-eslint');
 var excludeGitignore = require('gulp-exclude-gitignore');
 var mocha = require('gulp-mocha');
 var istanbul = require('gulp-istanbul');
@@ -8,14 +7,6 @@ var nsp = require('gulp-nsp');
 var plumber = require('gulp-plumber');
 var browserify = require('browserify');
 var source = require('vinyl-source-stream');
-
-function lint() {
-  return gulp.src(['**/*.js', '!**/*protocol_buffers*.js'])
-    .pipe(excludeGitignore())
-    .pipe(eslint())
-    .pipe(eslint.format())
-    .pipe(eslint.failAfterError());
-}
 
 exports.nsp = function (cb) {
   nsp('package.json', cb);
@@ -54,10 +45,8 @@ exports.browserify = function () {
     .pipe(gulp.dest('./build/'));
 };
 
-exports.lint = lint;
-exports.static = lint;
 exports.prepublish = function prepublish(cb) {
   cb();
 };
 exports.test = gulp.series(preTest, test);
-exports.default = gulp.series(lint, test);
+exports.default = gulp.series(test);
