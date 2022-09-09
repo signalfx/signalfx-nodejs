@@ -1,6 +1,6 @@
 {
   "name": "signalfx",
-  "version": "8.0.0",
+  "version": "8.0.0-beta.0",
   "description": "Node.js client library for SignalFx",
   "homepage": "https://signalfx.com",
   "repository": "https://github.com/signalfx/signalfx-nodejs",
@@ -19,10 +19,9 @@
     "nodejs"
   ],
   "devDependencies": {
-    "browserify": "^16.5.2",
     "chai": "^4.3.6",
     "eslint": "7.32",
-    "mocha": "^8.4.0",
+    "mocha": "^10.0.0",
     "mockery": "^2.1.0",
     "sinon": "^14.0.0",
     "vinyl-source-stream": "^2.0.0",
