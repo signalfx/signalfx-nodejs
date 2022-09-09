@@ -4,7 +4,7 @@
 
 ## 8.0.0-beta.1
 
-- Dropped support for Node.js below `11.0` ([#85](https://github.com/signalfx/signalfx-nodejs/pull/85))
+- Dropped support for Node.js below `12.10` ([#85](https://github.com/signalfx/signalfx-nodejs/pull/85))
 - Significant dependencies updates ([#85](https://github.com/signalfx/signalfx-nodejs/pull/85))
 - Replaced browserify with webpack ([#85](https://github.com/signalfx/signalfx-nodejs/pull/85))
 
