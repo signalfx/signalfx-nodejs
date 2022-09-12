@@ -1,0 +1,6 @@
+# Officially we support latest-1 for Chrome, FireFox, Safari, and Edge
+# Using the list below though to ensure maximum compatibility at minimal cost
+
+defaults
+not IE 11
+not IE_Mob 11

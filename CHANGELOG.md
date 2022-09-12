@@ -7,6 +7,7 @@
 - Dropped support for Node.js below `12.10` ([#85](https://github.com/signalfx/signalfx-nodejs/pull/85))
 - Significant dependencies updates ([#85](https://github.com/signalfx/signalfx-nodejs/pull/85))
 - Replaced browserify with webpack ([#85](https://github.com/signalfx/signalfx-nodejs/pull/85))
+- `proxy` configuration field now follows axios's format ([#85](https://github.com/signalfx/signalfx-nodejs/pull/85))
 
 ## 7.4.2
 

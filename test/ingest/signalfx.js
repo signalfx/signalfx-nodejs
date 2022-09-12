@@ -3,7 +3,7 @@
 
 var sinon = require('sinon');
 var mockery = require('mockery');
-require('request');
+const { expect } = require('chai');
 var should = require('chai').should();
 
 var signalFx;
@@ -24,7 +24,7 @@ describe('Integration test (Protobuf mode)', function () {
     requestStub = sinon.stub();
 
     // replace the module `request` with a stub object
-    mockery.registerMock('request', requestStub);
+    mockery.registerMock('axios', requestStub);
 
     signalFx = require('../../lib/signalfx');
     client = new signalFx.Ingest(token);
@@ -37,8 +37,8 @@ describe('Integration test (Protobuf mode)', function () {
 
 
   var counter = 0;
-  it('should sent ', function (done) {
-    requestStub.yields(null, {statusCode: 200}, 'OK');
+  it('should send', function (done) {
+    requestStub.resolves({ status: 200 });
 
     this.timeout(1200);
     setTimeout(done, 1000);
@@ -85,7 +85,6 @@ describe('Integration test (Protobuf mode)', function () {
   });
 });
 
-
 describe('SignalFx client library (Protobuf mode)', function () {
 
   var requestStub;
@@ -99,14 +98,12 @@ describe('SignalFx client library (Protobuf mode)', function () {
     });
 
     requestStub = sinon.stub();
-
-    // replace the module `request` with a stub object
-    mockery.registerMock('request', requestStub);
+    mockery.registerMock('axios', requestStub);
 
     tracingStub = sinon.stub();
     mockery.registerMock('../../tracing', { withNonReportingScope: function (callback) {
       tracingStub(callback);
-      callback();
+      return callback();
     }});
 
     signalFx = require('../../lib/signalfx');
@@ -153,7 +150,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
   });
 
   it('should be created with AWS Unique ID', function () {
-    requestStub.yields(null, {statusCode: 200}, '{"region": "region", "instanceId": "instance", "accountId": "account"}');
+    requestStub.resolves({status: 200, data: {"region": "region", "instanceId": "instance", "accountId": "account"}});
 
     var token = 'my token';
     var enableAmazonUniqueId = true;
@@ -162,19 +159,21 @@ describe('SignalFx client library (Protobuf mode)', function () {
       enableAmazonUniqueId: enableAmazonUniqueId
     });
 
-    tracingStub.called.should.be.equal(true);
-    client.apiToken.should.be.equal(token);
-    client.AWSUniqueId.should.be.equal('instance_region_account');
-    client.enableAmazonUniqueId.should.be.equal(true);
-    should.exist(client.globalDimensions[client.AWSUniqueId_DIMENTION_NAME]);
-    client.globalDimensions[client.AWSUniqueId_DIMENTION_NAME].should.be.equal('instance_region_account');
-
     var isInstancedOfSignalFx = (client instanceof signalFx.IngestJson);
     isInstancedOfSignalFx.should.be.equal(true);
+
+    return client.loadAWSUniqueId.then(() => {
+      tracingStub.called.should.be.equal(true);
+      client.apiToken.should.be.equal(token);
+      client.AWSUniqueId.should.be.equal('instance_region_account');
+      client.enableAmazonUniqueId.should.be.equal(true);
+      should.exist(client.globalDimensions[client.AWSUniqueId_DIMENTION_NAME]);
+      client.globalDimensions[client.AWSUniqueId_DIMENTION_NAME].should.be.equal('instance_region_account');
+    });
   });
 
-  it('should be not created with AWS Unique ID(wrong responce)', function () {
-    requestStub.yields(null, {statusCode: 28}, '');
+  it('should be not created with AWS Unique ID (wrong response)', function () {
+    requestStub.resolves({ status: 200, data: {} });
 
     var token = 'my token';
     var enableAmazonUniqueId = true;
@@ -183,14 +182,16 @@ describe('SignalFx client library (Protobuf mode)', function () {
       enableAmazonUniqueId: enableAmazonUniqueId
     });
 
-    tracingStub.called.should.be.equal(true);
-    client.apiToken.should.be.equal(token);
-    client.enableAmazonUniqueId.should.be.equal(false);
-    client.AWSUniqueId.should.be.equal('');
-    should.not.exist(client.globalDimensions[client.AWSUniqueId_DIMENTION_NAME]);
-
     var isInstancedOfSignalFx = (client instanceof signalFx.IngestJson);
     isInstancedOfSignalFx.should.be.equal(true);
+
+    return client.loadAWSUniqueId.then(() => {
+      tracingStub.called.should.be.equal(true);
+      client.apiToken.should.be.equal(token);
+      client.enableAmazonUniqueId.should.be.equal(false);
+      expect(client.AWSUniqueId).to.be.equal(undefined);
+      should.not.exist(client.globalDimensions[client.AWSUniqueId_DIMENTION_NAME]);
+    });
   });
 
   it('add datapoint to queue', function () {
@@ -213,7 +214,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
   });
 
   it('Send datapoint via queue', function (done) {
-    requestStub.yields(null, {statusCode: 200}, 'OK');
+    requestStub.resolves({ status: 200 });
 
     var token = 'my token';
     var client = new signalFx.Ingest(token);
@@ -236,7 +237,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
 
 
   it('Send event', function (done) {
-    requestStub.yields(null, {statusCode: 200}, 'OK');
+    requestStub.resolves({ status: 200 });
 
     var token = 'my token';
     var client = new signalFx.Ingest(token);
@@ -264,7 +265,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
   });
 
   it('Send datapoint with wrong token', function (done) {
-    requestStub.yields(null, {statusCode: 401}, 'Unauthorized');
+    requestStub.rejects({response: { status: 401 }, message: 'Unauthorized'});
 
     var token = 'my token';
     var client = new signalFx.Ingest(token);
@@ -276,19 +277,16 @@ describe('SignalFx client library (Protobuf mode)', function () {
 
     client.send({gauges: gauges});
 
-
     this.timeout(1020);
     setTimeout(function () {
       tracingStub.called.should.be.equal(true);
       requestStub.called.should.be.equal(true);
       done();
     }, 1000);
-
   });
 
-
   it('Send datapoint with wrong data', function (done) {
-    requestStub.yields(null, {statusCode: 400}, '');
+    requestStub.resolves({response: { status: 400 }, message: 'error'});
 
     var token = 'my token';
     var client = new signalFx.Ingest(token);
@@ -416,7 +414,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
       dimensions: {host: 'server1', host_ip: '1.2.3.4'}
     }];
     client.rawData.push({gauges: gauges});
-    requestStub.yields(null, {statusCode: 200}, 'OK');
+    requestStub.resolves({status: 200});
 
     client.processingData();
     client.queue.length.should.be.equal(1);
@@ -468,7 +466,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
 
     client.rawData.push({gauges: gauges});
 
-    requestStub.yields(null, {statusCode: 200}, 'OK');
+    requestStub.resolves({status: 200});
     client.processingData();
     client.queue.length.should.be.equal(1);
 
@@ -503,7 +501,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
   });
 
   it('should have only AWSUniqueID in dimensions (Protobuf)', function (done) {
-    requestStub.yields(null, {statusCode: 200}, '{"region": "region", "instanceId": "instance", "accountId": "account"}');
+    requestStub.resolves({status: 200, data: {"region": "region", "instanceId": "instance", "accountId": "account"}});
 
     var token = 'my token';
     var client = new signalFx.Ingest(token, {enableAmazonUniqueId: true});
@@ -524,7 +522,7 @@ describe('SignalFx client library (Protobuf mode)', function () {
   });
 
   it('should have AWSUniqueID in dimensions (Protobuf)', function (done) {
-    requestStub.yields(null, {statusCode: 200}, '{"region": "region", "instanceId": "instance", "accountId": "account"}');
+    requestStub.resolves({status: 200, data: {"region": "region", "instanceId": "instance", "accountId": "account"}});
 
     var token = 'my token';
     var client = new signalFx.Ingest(token, {enableAmazonUniqueId: true});
@@ -626,12 +624,12 @@ describe('SignalFx client library (Json mode)', function () {
     requestStub = sinon.stub();
 
     // replace the module `request` with a stub object
-    mockery.registerMock('request', requestStub);
+    mockery.registerMock('axios', requestStub);
 
     tracingStub = sinon.stub();
     mockery.registerMock('../../tracing', { withNonReportingScope: function (callback) {
       tracingStub(callback);
-      callback();
+      return callback();
     }});
 
     signalFx = require('../../lib/signalfx');
@@ -678,7 +676,7 @@ describe('SignalFx client library (Json mode)', function () {
   });
 
   it('should be created with AWS Unique ID', function () {
-    requestStub.yields(null, {statusCode: 200}, '{"region": "region", "instanceId": "instance", "accountId": "account"}');
+    requestStub.resolves({status: 200, data: {"region": "region", "instanceId": "instance", "accountId": "account"}});
 
     var token = 'my token';
     var enableAmazonUniqueId = true;
@@ -687,11 +685,13 @@ describe('SignalFx client library (Json mode)', function () {
       enableAmazonUniqueId: enableAmazonUniqueId
     });
 
-    client.apiToken.should.be.equal(token);
-    client.AWSUniqueId.should.be.equal('instance_region_account');
-
     var isInstancedOfSignalFx = (client instanceof signalFx.IngestJson);
     isInstancedOfSignalFx.should.be.equal(true);
+
+    return client.loadAWSUniqueId.then(() => {
+      client.apiToken.should.be.equal(token);
+      client.AWSUniqueId.should.be.equal('instance_region_account');
+    });
   });
 
   it('add datapoint to queue', function () {
@@ -714,7 +714,7 @@ describe('SignalFx client library (Json mode)', function () {
   });
 
   it('Send datapoint via queue', function (done) {
-    requestStub.yields(null, {statusCode: 200}, 'OK');
+    requestStub.resolves({status: 200});
 
     var token = 'my token';
     var client = new signalFx.IngestJson(token);
@@ -801,7 +801,7 @@ describe('SignalFx client library (Json mode)', function () {
       dimensions: {host: 'server1', host_ip: '1.2.3.4'}
     }];
 
-    requestStub.yields(null, {statusCode: 200}, 'OK');
+    requestStub.resolves({status: 200});
     client.rawData.push({gauges: gauges});
 
     client.processingData();
@@ -830,7 +830,7 @@ describe('SignalFx client library (Json mode)', function () {
       value: 10
     }];
 
-    requestStub.yields(null, {statusCode: 200}, 'OK');
+    requestStub.resolves({status: 200});
     client.rawData.push({gauges: gauges});
     client.processingData();
     client.queue.length.should.be.equal(1);
@@ -849,7 +849,7 @@ describe('SignalFx client library (Json mode)', function () {
   });
 
   it('should have only AWSUniqueID in dimensions (Json)', function (done) {
-    requestStub.yields(null, {statusCode: 200}, '{"region": "region", "instanceId": "instance", "accountId": "account"}');
+    requestStub.resolves({status: 200, data: {"region": "region", "instanceId": "instance", "accountId": "account"}});
 
     var token = 'my token';
     var client = new signalFx.IngestJson(token, {enableAmazonUniqueId: true});
@@ -861,7 +861,7 @@ describe('SignalFx client library (Json mode)', function () {
 
     this.setTimeout = 1050;
     setTimeout(function () {
-      requestStub.yields(null, {statusCode: 200}, 'OK');
+      requestStub.resolves({status: 200});
       client.send({gauges: gauges}).then(function () {
         client.AWSUniqueId.should.be.equal('instance_region_account');
         client.globalDimensions.AWSUniqueId.should.be.equal('instance_region_account');
@@ -872,7 +872,7 @@ describe('SignalFx client library (Json mode)', function () {
   });
 
   it('should have AWSUniqueID in dimensions (Json)', function (done) {
-    requestStub.yields(null, {statusCode: 200}, '{"region": "region", "instanceId": "instance", "accountId": "account"}');
+    requestStub.resolves({status: 200, data: {"region": "region", "instanceId": "instance", "accountId": "account"}});
 
     var token = 'my token';
     var client = new signalFx.IngestJson(token, {enableAmazonUniqueId: true});
@@ -885,7 +885,7 @@ describe('SignalFx client library (Json mode)', function () {
 
     this.setTimeout = 1050;
     setTimeout(function () {
-      requestStub.yields(null, {statusCode: 200}, 'OK');
+      requestStub.resolves({status: 200});
       client.send({gauges: gauges}).then(function () {
         client.AWSUniqueId.should.be.equal('instance_region_account');
         client.globalDimensions.AWSUniqueId.should.be.equal('instance_region_account');
@@ -904,7 +904,7 @@ describe('SignalFx client library (Json mode)', function () {
   });
 
   it('Send event', function (done) {
-    requestStub.yields(null, {statusCode: 200}, 'OK');
+    requestStub.resolves({status: 200});
 
     var token = 'my token';
     var client = new signalFx.IngestJson(token);
@@ -978,7 +978,7 @@ describe('SignalFx client library (General)', function () {
     requestStub = sinon.stub();
 
     // replace the module `request` with a stub object
-    mockery.registerMock('request', requestStub);
+    mockery.registerMock('axios', requestStub);
 
     signalFx = require('../../lib/signalfx');
   });
