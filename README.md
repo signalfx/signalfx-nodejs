@@ -65,7 +65,18 @@ Object `options` is an optional map and may contains following fields:
 - **timeout** - number, sending datapoints timeout in ms (default is 5000ms)
 - **batchSize** - number, batch size to group sending datapoints
 - **userAgents** - array of strings, items from this array will be added to 'user-agent' header separated by comma
-- **proxy** - string, defines an address and credentials for sending metrics through a proxy server. The string should have the following format `http://<USER>:<PASSWORD>@<HOST>:<PORT>`
+- **proxy** - object, defines an address and credentials for sending metrics through a proxy server, it has the following format:
+    ```javascript
+    {
+      protocol: 'http(s)',
+      host: '127.0.0.1',
+      port: 1234,
+      auth: {
+        username: '<username>',
+        password: '<password>'
+      }
+    },
+    ```
 
 #### Configuring the ingest endpoint
 
