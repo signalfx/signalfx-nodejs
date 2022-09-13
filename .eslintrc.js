@@ -14,8 +14,6 @@ module.exports = {
   },
   "rules": {
     "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
-
-    // TODO: review this
-    "no-prototype-builtins": ["warn"]
+    "no-prototype-builtins": ["off"]
   }
 };
