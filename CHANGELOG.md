@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 8.0.0-beta.2
+
+- Include browser build in the package ([#86](https://github.com/signalfx/signalfx-nodejs/pull/86))
+
 ## 8.0.0-beta.1
 
 - Dropped support for Node.js below `12.10` ([#85](https://github.com/signalfx/signalfx-nodejs/pull/85))
