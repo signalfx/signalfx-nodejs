@@ -26,10 +26,11 @@ $ npm install signalfx
 
 ### Supported Node.js versions
 
-| Version | Node.js       |
-| ------- | ------------- |
-| `7.4.x` | `>=8.0.0 <18` |
-| `7.3.1` | `>=8.0.0 <11` |
+| Version | Node.js        |
+| ------- | -------------- |
+| `8.x.x` | `>=12.10.0 <18` |
+| `7.4.x` | `>=8.0.0 <18`  |
+| `7.3.1` | `>=8.0.0 <11`  |
 
 ## Usage
 
@@ -64,7 +65,18 @@ Object `options` is an optional map and may contains following fields:
 - **timeout** - number, sending datapoints timeout in ms (default is 5000ms)
 - **batchSize** - number, batch size to group sending datapoints
 - **userAgents** - array of strings, items from this array will be added to 'user-agent' header separated by comma
-- **proxy** - string, defines an address and credentials for sending metrics through a proxy server. The string should have the following format `http://<USER>:<PASSWORD>@<HOST>:<PORT>`
+- **proxy** - object, defines an address and credentials for sending metrics through a proxy server, it has the following format:
+    ```javascript
+    {
+      protocol: 'http(s)',
+      host: '127.0.0.1',
+      port: 1234,
+      auth: {
+        username: '<username>',
+        password: '<password>'
+      }
+    },
+    ```
 
 #### Configuring the ingest endpoint
 
@@ -229,7 +241,7 @@ See `example/general_usage.js` for a complete code example for Reporting data.
 Set your SignalFx token and run example
 
 ```sh
-$ node path/to/example/general_usage.js
+$ SPLUNK_ACCESS_TOKEN=xxx SPLUNK_REALM=xxx node example/general_usage.js
 ```
 
 ### Log level
