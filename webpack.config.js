@@ -1,18 +1,19 @@
 const path = require('path');
+const webpack = require('webpack');
+const { default: merge } = require('webpack-merge');
 
-module.exports = (_, argv) => ({
-  mode: "production",
+const baseConfig = {
+  mode: "development",
   devtool: "inline-source-map",
   entry: "./lib/signalfx_browser.js",
-  externals: [
-    "ws"
-  ],
   output: {
     filename: "signalfx.js",
     path: path.resolve(__dirname, "build"),
     publicPath: "auto",
-    library: "signalfx",
-    libraryTarget: "umd",
+    library: {
+      name: "signalfx.streamer",
+      type: "umd"
+    },
   },
   module: {
     rules: [
@@ -27,4 +28,21 @@ module.exports = (_, argv) => ({
       },
     ],
   },
-});
+  plugins: [
+    new webpack.NormalModuleReplacementPlugin(/^ws$/, (resource) => {
+      const pathToWsReplacement = path.resolve(__dirname, 'lib', 'browser', 'ws.js');
+      resource.request = path.relative(resource.context, pathToWsReplacement);
+    }),
+  ],
+};
+
+module.exports = (_, argv) => ([
+  baseConfig,
+  merge(baseConfig, {
+    mode: 'production',
+    devtool: false,
+    output: {
+      filename: "signalfx.min.js",
+    },
+  })
+]);
