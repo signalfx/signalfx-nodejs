@@ -1,6 +1,6 @@
 {
   "name": "signalfx",
-  "version": "8.0.0-beta.1",
+  "version": "8.0.0-beta.2",
   "description": "Node.js client library for SignalFx",
   "homepage": "https://signalfx.com",
   "repository": "https://github.com/signalfx/signalfx-nodejs",
@@ -11,9 +11,11 @@
   },
   "files": [
     "lib",
-    "proto"
+    "proto",
+    "build"
   ],
   "main": "lib/signalfx.js",
+  "browser": "build/signalfx.js",
   "keywords": [
     "signalfx",
     "nodejs"
@@ -36,7 +38,6 @@
     "base64-js": "^1.5.1",
     "bignumber.js": "^9.1.0",
     "https-proxy-agent": "^5.0.1",
-    "node-fetch": "^2.6.7",
     "pako": "^2.0.4",
     "protobufjs": "^6.0.0",
     "sse.js": "^0.6.0",
@@ -47,7 +48,8 @@
     "genprotobuf": "pbjs -t static-module -w commonjs proto/signal_fx_protocol_buffers.proto > ./proto/signal_fx_protocol_buffers_pb2.js",
     "lint": "eslint lib/** .eslintrc.js",
     "test": "mocha --watch --bail --recursive -n unhandled-rejections=strict './test/**'",
-    "test:ci": "mocha --recursive -n unhandled-rejections=strict './test/**'"
+    "test:ci": "mocha --recursive -n unhandled-rejections=strict './test/**'",
+    "postinstall": "npm run build:browser"
   },
   "engines": {
     "node": ">=12.10 <19"
