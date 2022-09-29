@@ -1,0 +1,56 @@
+default:
+  image: 'cimg/node:lts'
+
+include:
+  - project: 'ci-cd/templates'
+    ref: master
+    file: '/prodsec/.oss-scan.yml'
+
+cache:
+  key:
+    files:
+      - package-lock.json
+  paths:
+    - .npm/
+    - node_modules/
+
+stages:
+  - setup
+  - test
+  - build
+  - build-browser
+
+oss-scan:
+  stage: setup
+  extends: .oss-scan
+
+install:
+  stage: setup
+  script:
+    - npm ci
+
+build:
+  stage: build
+  artifacts:
+    paths:
+      - proto/
+  script:
+    - npm run genprotobuf
+
+test:
+  stage: test
+  script:
+    - npm run test:ci
+
+lint:
+  stage: test
+  script:
+    - npm run lint
+
+build-browser:
+  stage: build-browser
+  artifacts:
+    paths:
+      - build/
+  script:
+    - npm run build:browser
