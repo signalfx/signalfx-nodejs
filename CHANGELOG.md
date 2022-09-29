@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 8.0.0-beta.4
+
+- Don't overwrite `window.signalfx` ([#87](https://github.com/signalfx/signalfx-nodejs/pull/87))
+
 ## 8.0.0-beta.2
 
 - Include browser build in the package ([#86](https://github.com/signalfx/signalfx-nodejs/pull/86))
