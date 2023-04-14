@@ -391,7 +391,7 @@ The signalflow client can be built for usage in a browser. This is accomplished 
 
 ```
 $ npm install
-$ gulp browserify
+$ npm run build:browser
 The output can be found at ./build/signalfx.js
 ```
 
