@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Fixed `browser` aliases field in `package.json`
+- Moved browser build from `postinstall` to `prepare`
+- restrict npm version to >=7.0 <10
+
 ## 8.0.0-beta.4
 
 - Don't overwrite `window.signalfx` ([#87](https://github.com/signalfx/signalfx-nodejs/pull/87))
