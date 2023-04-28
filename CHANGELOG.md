@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 8.0.0-beta.5
+
 - Fixed `browser` aliases field in `package.json`
 - Moved browser build from `postinstall` to `prepare`
 - restrict npm version to >=7.0 <10
