@@ -178,15 +178,18 @@ $root.com = (function() {
                         while (reader.pos < end) {
                             var tag = reader.uint32();
                             switch (tag >>> 3) {
-                            case 1:
-                                message.strValue = reader.string();
-                                break;
-                            case 2:
-                                message.doubleValue = reader.double();
-                                break;
-                            case 3:
-                                message.intValue = reader.int64();
-                                break;
+                            case 1: {
+                                    message.strValue = reader.string();
+                                    break;
+                                }
+                            case 2: {
+                                    message.doubleValue = reader.double();
+                                    break;
+                                }
+                            case 3: {
+                                    message.intValue = reader.int64();
+                                    break;
+                                }
                             default:
                                 reader.skipType(tag & 7);
                                 break;
@@ -307,6 +310,21 @@ $root.com = (function() {
                         return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
                     };
 
+                    /**
+                     * Gets the default type url for Datum
+                     * @function getTypeUrl
+                     * @memberof com.signalfx.metrics.protobuf.Datum
+                     * @static
+                     * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                     * @returns {string} The default type url
+                     */
+                    Datum.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+                        if (typeUrlPrefix === undefined) {
+                            typeUrlPrefix = "type.googleapis.com";
+                        }
+                        return typeUrlPrefix + "/com.signalfx.metrics.protobuf.Datum";
+                    };
+
                     return Datum;
                 })();
 
@@ -413,12 +431,14 @@ $root.com = (function() {
                         while (reader.pos < end) {
                             var tag = reader.uint32();
                             switch (tag >>> 3) {
-                            case 1:
-                                message.key = reader.string();
-                                break;
-                            case 2:
-                                message.value = reader.string();
-                                break;
+                            case 1: {
+                                    message.key = reader.string();
+                                    break;
+                                }
+                            case 2: {
+                                    message.value = reader.string();
+                                    break;
+                                }
                             default:
                                 reader.skipType(tag & 7);
                                 break;
@@ -515,6 +535,21 @@ $root.com = (function() {
                      */
                     Dimension.prototype.toJSON = function toJSON() {
                         return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+                    };
+
+                    /**
+                     * Gets the default type url for Dimension
+                     * @function getTypeUrl
+                     * @memberof com.signalfx.metrics.protobuf.Dimension
+                     * @static
+                     * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                     * @returns {string} The default type url
+                     */
+                    Dimension.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+                        if (typeUrlPrefix === undefined) {
+                            typeUrlPrefix = "type.googleapis.com";
+                        }
+                        return typeUrlPrefix + "/com.signalfx.metrics.protobuf.Dimension";
                     };
 
                     return Dimension;
@@ -669,26 +704,32 @@ $root.com = (function() {
                         while (reader.pos < end) {
                             var tag = reader.uint32();
                             switch (tag >>> 3) {
-                            case 1:
-                                message.source = reader.string();
-                                break;
-                            case 2:
-                                message.metric = reader.string();
-                                break;
-                            case 3:
-                                message.timestamp = reader.int64();
-                                break;
-                            case 4:
-                                message.value = $root.com.signalfx.metrics.protobuf.Datum.decode(reader, reader.uint32());
-                                break;
-                            case 5:
-                                message.metricType = reader.int32();
-                                break;
-                            case 6:
-                                if (!(message.dimensions && message.dimensions.length))
-                                    message.dimensions = [];
-                                message.dimensions.push($root.com.signalfx.metrics.protobuf.Dimension.decode(reader, reader.uint32()));
-                                break;
+                            case 1: {
+                                    message.source = reader.string();
+                                    break;
+                                }
+                            case 2: {
+                                    message.metric = reader.string();
+                                    break;
+                                }
+                            case 3: {
+                                    message.timestamp = reader.int64();
+                                    break;
+                                }
+                            case 4: {
+                                    message.value = $root.com.signalfx.metrics.protobuf.Datum.decode(reader, reader.uint32());
+                                    break;
+                                }
+                            case 5: {
+                                    message.metricType = reader.int32();
+                                    break;
+                                }
+                            case 6: {
+                                    if (!(message.dimensions && message.dimensions.length))
+                                        message.dimensions = [];
+                                    message.dimensions.push($root.com.signalfx.metrics.protobuf.Dimension.decode(reader, reader.uint32()));
+                                    break;
+                                }
                             default:
                                 reader.skipType(tag & 7);
                                 break;
@@ -791,6 +832,12 @@ $root.com = (function() {
                             message.value = $root.com.signalfx.metrics.protobuf.Datum.fromObject(object.value);
                         }
                         switch (object.metricType) {
+                        default:
+                            if (typeof object.metricType === "number") {
+                                message.metricType = object.metricType;
+                                break;
+                            }
+                            break;
                         case "GAUGE":
                         case 0:
                             message.metricType = 0;
@@ -859,7 +906,7 @@ $root.com = (function() {
                         if (message.value != null && message.hasOwnProperty("value"))
                             object.value = $root.com.signalfx.metrics.protobuf.Datum.toObject(message.value, options);
                         if (message.metricType != null && message.hasOwnProperty("metricType"))
-                            object.metricType = options.enums === String ? $root.com.signalfx.metrics.protobuf.MetricType[message.metricType] : message.metricType;
+                            object.metricType = options.enums === String ? $root.com.signalfx.metrics.protobuf.MetricType[message.metricType] === undefined ? message.metricType : $root.com.signalfx.metrics.protobuf.MetricType[message.metricType] : message.metricType;
                         if (message.dimensions && message.dimensions.length) {
                             object.dimensions = [];
                             for (var j = 0; j < message.dimensions.length; ++j)
@@ -877,6 +924,21 @@ $root.com = (function() {
                      */
                     DataPoint.prototype.toJSON = function toJSON() {
                         return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+                    };
+
+                    /**
+                     * Gets the default type url for DataPoint
+                     * @function getTypeUrl
+                     * @memberof com.signalfx.metrics.protobuf.DataPoint
+                     * @static
+                     * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                     * @returns {string} The default type url
+                     */
+                    DataPoint.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+                        if (typeUrlPrefix === undefined) {
+                            typeUrlPrefix = "type.googleapis.com";
+                        }
+                        return typeUrlPrefix + "/com.signalfx.metrics.protobuf.DataPoint";
                     };
 
                     return DataPoint;
@@ -976,11 +1038,12 @@ $root.com = (function() {
                         while (reader.pos < end) {
                             var tag = reader.uint32();
                             switch (tag >>> 3) {
-                            case 1:
-                                if (!(message.datapoints && message.datapoints.length))
-                                    message.datapoints = [];
-                                message.datapoints.push($root.com.signalfx.metrics.protobuf.DataPoint.decode(reader, reader.uint32()));
-                                break;
+                            case 1: {
+                                    if (!(message.datapoints && message.datapoints.length))
+                                        message.datapoints = [];
+                                    message.datapoints.push($root.com.signalfx.metrics.protobuf.DataPoint.decode(reader, reader.uint32()));
+                                    break;
+                                }
                             default:
                                 reader.skipType(tag & 7);
                                 break;
@@ -1085,6 +1148,21 @@ $root.com = (function() {
                      */
                     DataPointUploadMessage.prototype.toJSON = function toJSON() {
                         return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+                    };
+
+                    /**
+                     * Gets the default type url for DataPointUploadMessage
+                     * @function getTypeUrl
+                     * @memberof com.signalfx.metrics.protobuf.DataPointUploadMessage
+                     * @static
+                     * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                     * @returns {string} The default type url
+                     */
+                    DataPointUploadMessage.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+                        if (typeUrlPrefix === undefined) {
+                            typeUrlPrefix = "type.googleapis.com";
+                        }
+                        return typeUrlPrefix + "/com.signalfx.metrics.protobuf.DataPointUploadMessage";
                     };
 
                     return DataPointUploadMessage;
@@ -1193,12 +1271,14 @@ $root.com = (function() {
                         while (reader.pos < end) {
                             var tag = reader.uint32();
                             switch (tag >>> 3) {
-                            case 3:
-                                message.timestamp = reader.int64();
-                                break;
-                            case 4:
-                                message.value = $root.com.signalfx.metrics.protobuf.Datum.decode(reader, reader.uint32());
-                                break;
+                            case 3: {
+                                    message.timestamp = reader.int64();
+                                    break;
+                                }
+                            case 4: {
+                                    message.value = $root.com.signalfx.metrics.protobuf.Datum.decode(reader, reader.uint32());
+                                    break;
+                                }
                             default:
                                 reader.skipType(tag & 7);
                                 break;
@@ -1314,6 +1394,21 @@ $root.com = (function() {
                      */
                     PointValue.prototype.toJSON = function toJSON() {
                         return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+                    };
+
+                    /**
+                     * Gets the default type url for PointValue
+                     * @function getTypeUrl
+                     * @memberof com.signalfx.metrics.protobuf.PointValue
+                     * @static
+                     * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                     * @returns {string} The default type url
+                     */
+                    PointValue.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+                        if (typeUrlPrefix === undefined) {
+                            typeUrlPrefix = "type.googleapis.com";
+                        }
+                        return typeUrlPrefix + "/com.signalfx.metrics.protobuf.PointValue";
                     };
 
                     return PointValue;
@@ -1446,12 +1541,14 @@ $root.com = (function() {
                         while (reader.pos < end) {
                             var tag = reader.uint32();
                             switch (tag >>> 3) {
-                            case 1:
-                                message.key = reader.string();
-                                break;
-                            case 2:
-                                message.value = $root.com.signalfx.metrics.protobuf.PropertyValue.decode(reader, reader.uint32());
-                                break;
+                            case 1: {
+                                    message.key = reader.string();
+                                    break;
+                                }
+                            case 2: {
+                                    message.value = $root.com.signalfx.metrics.protobuf.PropertyValue.decode(reader, reader.uint32());
+                                    break;
+                                }
                             default:
                                 reader.skipType(tag & 7);
                                 break;
@@ -1553,6 +1650,21 @@ $root.com = (function() {
                      */
                     Property.prototype.toJSON = function toJSON() {
                         return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+                    };
+
+                    /**
+                     * Gets the default type url for Property
+                     * @function getTypeUrl
+                     * @memberof com.signalfx.metrics.protobuf.Property
+                     * @static
+                     * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                     * @returns {string} The default type url
+                     */
+                    Property.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+                        if (typeUrlPrefix === undefined) {
+                            typeUrlPrefix = "type.googleapis.com";
+                        }
+                        return typeUrlPrefix + "/com.signalfx.metrics.protobuf.Property";
                     };
 
                     return Property;
@@ -1683,18 +1795,22 @@ $root.com = (function() {
                         while (reader.pos < end) {
                             var tag = reader.uint32();
                             switch (tag >>> 3) {
-                            case 1:
-                                message.strValue = reader.string();
-                                break;
-                            case 2:
-                                message.doubleValue = reader.double();
-                                break;
-                            case 3:
-                                message.intValue = reader.int64();
-                                break;
-                            case 4:
-                                message.boolValue = reader.bool();
-                                break;
+                            case 1: {
+                                    message.strValue = reader.string();
+                                    break;
+                                }
+                            case 2: {
+                                    message.doubleValue = reader.double();
+                                    break;
+                                }
+                            case 3: {
+                                    message.intValue = reader.int64();
+                                    break;
+                                }
+                            case 4: {
+                                    message.boolValue = reader.bool();
+                                    break;
+                                }
                             default:
                                 reader.skipType(tag & 7);
                                 break;
@@ -1821,6 +1937,21 @@ $root.com = (function() {
                      */
                     PropertyValue.prototype.toJSON = function toJSON() {
                         return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+                    };
+
+                    /**
+                     * Gets the default type url for PropertyValue
+                     * @function getTypeUrl
+                     * @memberof com.signalfx.metrics.protobuf.PropertyValue
+                     * @static
+                     * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                     * @returns {string} The default type url
+                     */
+                    PropertyValue.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+                        if (typeUrlPrefix === undefined) {
+                            typeUrlPrefix = "type.googleapis.com";
+                        }
+                        return typeUrlPrefix + "/com.signalfx.metrics.protobuf.PropertyValue";
                     };
 
                     return PropertyValue;
@@ -1965,25 +2096,30 @@ $root.com = (function() {
                         while (reader.pos < end) {
                             var tag = reader.uint32();
                             switch (tag >>> 3) {
-                            case 1:
-                                message.eventType = reader.string();
-                                break;
-                            case 2:
-                                if (!(message.dimensions && message.dimensions.length))
-                                    message.dimensions = [];
-                                message.dimensions.push($root.com.signalfx.metrics.protobuf.Dimension.decode(reader, reader.uint32()));
-                                break;
-                            case 3:
-                                if (!(message.properties && message.properties.length))
-                                    message.properties = [];
-                                message.properties.push($root.com.signalfx.metrics.protobuf.Property.decode(reader, reader.uint32()));
-                                break;
-                            case 4:
-                                message.category = reader.int32();
-                                break;
-                            case 5:
-                                message.timestamp = reader.int64();
-                                break;
+                            case 1: {
+                                    message.eventType = reader.string();
+                                    break;
+                                }
+                            case 2: {
+                                    if (!(message.dimensions && message.dimensions.length))
+                                        message.dimensions = [];
+                                    message.dimensions.push($root.com.signalfx.metrics.protobuf.Dimension.decode(reader, reader.uint32()));
+                                    break;
+                                }
+                            case 3: {
+                                    if (!(message.properties && message.properties.length))
+                                        message.properties = [];
+                                    message.properties.push($root.com.signalfx.metrics.protobuf.Property.decode(reader, reader.uint32()));
+                                    break;
+                                }
+                            case 4: {
+                                    message.category = reader.int32();
+                                    break;
+                                }
+                            case 5: {
+                                    message.timestamp = reader.int64();
+                                    break;
+                                }
                             default:
                                 reader.skipType(tag & 7);
                                 break;
@@ -2095,6 +2231,12 @@ $root.com = (function() {
                             }
                         }
                         switch (object.category) {
+                        default:
+                            if (typeof object.category === "number") {
+                                message.category = object.category;
+                                break;
+                            }
+                            break;
                         case "USER_DEFINED":
                         case 1000000:
                             message.category = 1000000;
@@ -2175,7 +2317,7 @@ $root.com = (function() {
                                 object.properties[j] = $root.com.signalfx.metrics.protobuf.Property.toObject(message.properties[j], options);
                         }
                         if (message.category != null && message.hasOwnProperty("category"))
-                            object.category = options.enums === String ? $root.com.signalfx.metrics.protobuf.EventCategory[message.category] : message.category;
+                            object.category = options.enums === String ? $root.com.signalfx.metrics.protobuf.EventCategory[message.category] === undefined ? message.category : $root.com.signalfx.metrics.protobuf.EventCategory[message.category] : message.category;
                         if (message.timestamp != null && message.hasOwnProperty("timestamp"))
                             if (typeof message.timestamp === "number")
                                 object.timestamp = options.longs === String ? String(message.timestamp) : message.timestamp;
@@ -2193,6 +2335,21 @@ $root.com = (function() {
                      */
                     Event.prototype.toJSON = function toJSON() {
                         return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+                    };
+
+                    /**
+                     * Gets the default type url for Event
+                     * @function getTypeUrl
+                     * @memberof com.signalfx.metrics.protobuf.Event
+                     * @static
+                     * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                     * @returns {string} The default type url
+                     */
+                    Event.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+                        if (typeUrlPrefix === undefined) {
+                            typeUrlPrefix = "type.googleapis.com";
+                        }
+                        return typeUrlPrefix + "/com.signalfx.metrics.protobuf.Event";
                     };
 
                     return Event;
@@ -2292,11 +2449,12 @@ $root.com = (function() {
                         while (reader.pos < end) {
                             var tag = reader.uint32();
                             switch (tag >>> 3) {
-                            case 1:
-                                if (!(message.events && message.events.length))
-                                    message.events = [];
-                                message.events.push($root.com.signalfx.metrics.protobuf.Event.decode(reader, reader.uint32()));
-                                break;
+                            case 1: {
+                                    if (!(message.events && message.events.length))
+                                        message.events = [];
+                                    message.events.push($root.com.signalfx.metrics.protobuf.Event.decode(reader, reader.uint32()));
+                                    break;
+                                }
                             default:
                                 reader.skipType(tag & 7);
                                 break;
@@ -2401,6 +2559,21 @@ $root.com = (function() {
                      */
                     EventUploadMessage.prototype.toJSON = function toJSON() {
                         return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+                    };
+
+                    /**
+                     * Gets the default type url for EventUploadMessage
+                     * @function getTypeUrl
+                     * @memberof com.signalfx.metrics.protobuf.EventUploadMessage
+                     * @static
+                     * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                     * @returns {string} The default type url
+                     */
+                    EventUploadMessage.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+                        if (typeUrlPrefix === undefined) {
+                            typeUrlPrefix = "type.googleapis.com";
+                        }
+                        return typeUrlPrefix + "/com.signalfx.metrics.protobuf.EventUploadMessage";
                     };
 
                     return EventUploadMessage;
