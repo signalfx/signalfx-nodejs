@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const { default: merge } = require('webpack-merge');
+const CopyPlugin = require('copy-webpack-plugin');
 
 const baseConfig = {
   mode: "development",
@@ -32,6 +33,14 @@ const baseConfig = {
     new webpack.NormalModuleReplacementPlugin(/^ws$/, (resource) => {
       const pathToWsReplacement = path.resolve(__dirname, 'lib', 'browser', 'ws.js');
       resource.request = path.relative(resource.context, pathToWsReplacement);
+    }),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: './lib/signalfx.d.ts',
+          to: path.resolve(__dirname, 'build', 'signalfx.min.d.ts'),
+        },
+      ],
     }),
   ],
 };

@@ -12,7 +12,8 @@
   "files": [
     "lib",
     "proto",
-    "build/signalfx.min.js"
+    "build/signalfx.min.js",
+    "build/signalfx.min.d.ts"
   ],
   "main": "lib/signalfx.js",
   "browser": {
@@ -27,6 +28,7 @@
     "@splunk/babel-preset": "^3.0.0",
     "babel-loader": "^8.2.5",
     "chai": "^4.3.6",
+    "copy-webpack-plugin": "^11.0.0",
     "eslint": "7.32",
     "mocha": "^10.0.0",
     "mockery": "^2.1.0",
