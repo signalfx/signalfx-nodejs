@@ -230,6 +230,34 @@ describe('SignalFx client library (Protobuf mode)', function () {
     setTimeout(function () {
       tracingStub.called.should.be.equal(true);
       requestStub.called.should.be.equal(true);
+      client.queue.length.should.be.equal(0);
+      done();
+    }, 2000);
+
+  });
+
+  it('Send many datapoints via queue', function (done) {
+    requestStub.resolves({ status: 200 });
+
+    var token = 'my token';
+    var client = new signalFx.Ingest(token);
+
+    var gauges = [];
+    // Test with more than the batchSize
+    for (let i = 0; i < 500; i++) {
+      gauges.push({
+        metric: `test.cpu${i}`,
+        value: 10,
+      });
+    }
+
+    client.send({gauges: gauges});
+
+    this.timeout(2020);
+    setTimeout(function () {
+      tracingStub.called.should.be.equal(true);
+      requestStub.called.should.be.equal(true);
+      client.queue.length.should.be.equal(0);
       done();
     }, 2000);
 
