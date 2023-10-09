@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 8.0.0-beta.6
+
+- Add type definitions for SignalFlow client. [#103](https://github.com/signalfx/signalfx-nodejs/pull/103)
+- Send remaining queue items if there are more than chunkSize in the queue. [#107](https://github.com/signalfx/signalfx-nodejs/pull/107)
+- Use splice() instead of repeated shift() to remove from queue. [#106](https://github.com/signalfx/signalfx-nodejs/pull/106)
+- Fix protobufjs security vulnerability CVE-2023-36665 [#99](https://github.com/signalfx/signalfx-nodejs/pull/99)
+- Add Node 20 to supported engines.
+
 ## 8.0.0-beta.5
 
 - Fixed `browser` aliases field in `package.json`
