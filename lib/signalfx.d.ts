@@ -14,6 +14,7 @@ export interface ExecuteOptions {
     usedByDetectorUI?: boolean;
     useCache?: boolean;
     compress?: boolean;
+    filter?: string;
 }
 
 type SignalFlow = (token: string, options: SignalFlowClientOptions) => SignalFlowClient;
