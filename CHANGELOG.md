@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 8.0.1
+
+- Improve type definitions for SignalFlow client. [#119](https://github.com/signalfx/signalfx-nodejs/pull/119)
+
 ## 8.0.0
 
 - Add type definitions for SignalFlow and ingest clients. [#113](https://github.com/signalfx/signalfx-nodejs/pull/113)
