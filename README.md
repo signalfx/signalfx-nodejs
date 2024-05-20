@@ -252,7 +252,7 @@ You can override it by setting `SFX_CLIENT_LOG_LEVEL` environment variable. Vali
 ## SignalFlow API
 
 > [!WARNING]
-> `github.com/signalfx/signalfx-nodejs/lib/client/signalflow` has been moved to [`github.com/signalfx/signalflow-client-js`](https://github.com/signalfx/signalflow-client-js) and is now available under a separate [`signalflow`](https://www.npmjs.com/package/signalflow) package. The library is **deprecated** as part of `signalfx-nodejs` and will be removed in later versions.
+> `signalflow` has been moved to [`github.com/signalfx/signalflow-client-js`](https://github.com/signalfx/signalflow-client-js) and is now available under a separate [`signalflow`](https://www.npmjs.com/package/signalflow) package. The library is **deprecated** as part of `signalfx-nodejs` and will be removed in later versions.
 
 SignalFlow is SignalFx's real-time analytics computation language. The
 SignalFlow API allows SignalFx users to execute real-time streaming analytics
