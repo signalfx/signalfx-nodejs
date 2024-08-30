@@ -11,6 +11,21 @@
 
 # Node.js client library for SignalFx
 
+# :warning:This repository and its published libraries are deprecated
+
+This repository contains legacy libraries for reporting metrics to Splunk 
+Observability Cloud (formerly SignalFx). The only commits that will be made 
+to this repo are organizational or security related patches. No additional 
+features will be added, and the repository will be archived and the final 
+versions published on or prior to March 1, 2025.
+
+# :warning:This repo will be archived March 1st 2025.
+
+Splunk has adopted OpenTelemetry. Please visit official documentation page: [Instrument Node.js applications for Splunk Observability Cloud](https://docs.splunk.com/observability/en/gdi/get-data-in/application/nodejs/get-started.html#get-started-nodejs). Use [Splunk Distribution of OpenTelemetry for Node.js](https://github.com/signalfx/splunk-otel-js) or [OpenTelemetry JavaScript instrumentation distribution](https://github.com/open-telemetry/opentelemetry-js) to send telemetry data to Splunk Observability Cloud. 
+Do not integrate `signalfx-nodejs` into new services.
+
+## Overview 
+
 This is a programmatic interface in JavaScript for SignalFx's metadata and
 ingest APIs. It is meant to provide a base for communicating with
 SignalFx APIs that can be easily leveraged by scripts and applications
