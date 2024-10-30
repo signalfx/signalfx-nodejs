@@ -26,10 +26,10 @@ export interface SignalReport {
 
 export class Ingest {
     constructor(token: string, options?: IngestOptions);
-    send(report: SignalReport): void;
+    send(report: SignalReport): Promise<void>;
 }
 
 export class IngestJson {
     constructor(token: string, options?: IngestOptions);
-    send(report: SignalReport): void;
+    send(report: SignalReport): Promise<void>;
 }
